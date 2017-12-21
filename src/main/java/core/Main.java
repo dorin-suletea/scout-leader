@@ -1,16 +1,16 @@
 package core;
 
-import api.ApiException;
-import api.exchanges.BittrexApi;
-import api.ApiFactory;
+import api.BittrexManager;
 
 /**
  * Created by next on 12/20/17.
  */
 public class Main {
-    public static void main(String args[]) throws ApiException {
+    public static void main(String args[]) {
+        BittrexManager bittrexManager = RuntimeModule.getInjectedObject(BittrexManager.class);
+//        ApiFactoryImpl apiFact = RuntimeModule.getInjectedObject(ApiFactoryImpl.class);
 
-        //BittrexApi bitApi =  new ApiFactory(apiDecoderProvider).makeBittrexApi();
-        //System.out.println(bitApi.getMarketSummaries().get(0).getLeftSymbol());
+
+        System.out.println(bittrexManager.getPairs());
     }
 }

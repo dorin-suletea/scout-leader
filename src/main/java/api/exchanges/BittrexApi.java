@@ -1,6 +1,7 @@
 package api.exchanges;
 
-import api.model.ApiPair;
+import api.model.ApiInstrument;
+import api.model.InstrumentWitdrawalFee;
 import feign.RequestLine;
 
 import java.util.List;
@@ -12,5 +13,8 @@ public interface BittrexApi {
     String BITTREX_URL = "https://bittrex.com/api/v1.1";
 
     @RequestLine("GET /public/getmarketsummaries")
-    List<ApiPair> getMarketSummaries();
+    List<ApiInstrument> getInstruments();
+
+    @RequestLine("GET /public/getcurrencies ")
+    List<InstrumentWitdrawalFee> getWitdrawalFees();
 }

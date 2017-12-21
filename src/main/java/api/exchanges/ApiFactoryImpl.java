@@ -1,17 +1,18 @@
-package api;
+package api.exchanges;
 
-import api.exchanges.BittrexApi;
 import feign.Feign;
 import feign.codec.Decoder;
 import feign.jackson.JacksonEncoder;
 
-/**
- * Created by next on 12/21/17.
- */
-public class ApiFactory {
-    private final ApiDecoderProvider apiDecoderProvider;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-    public ApiFactory(final ApiDecoderProvider apiDecoderProvider) {
+@Singleton
+public class ApiFactoryImpl implements ApiFactory{
+    private final ApiDecoderImpl apiDecoderProvider;
+
+    @Inject
+    public ApiFactoryImpl(final ApiDecoderImpl apiDecoderProvider) {
         this.apiDecoderProvider = apiDecoderProvider;
     }
 
