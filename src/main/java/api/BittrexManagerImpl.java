@@ -3,13 +3,13 @@ package api;
 import api.exchanges.ApiHelper;
 import api.exchanges.BittrexApi;
 import api.model.ApiInstrument;
+import api.model.InstrumentInfo;
 import core.MathHelper;
 import core.model.Exchange;
 import core.model.Instrument;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,8 +39,9 @@ public class BittrexManagerImpl implements BittrexManager{
     }
 
     @Override
-    public Map<String, Double> getWithdrawFeeMap() {
-        return new HashMap<>();
+    public Map<String, InstrumentInfo> getInstrumentInfo() {
+        bittrexApi.getInstrumentsInfo();
+        return null;
     }
 
     private double getIBuyFee(final ApiInstrument apiInstrument) {
