@@ -3,13 +3,15 @@ package api;
 import api.exchanges.ApiHelper;
 import api.exchanges.BittrexApi;
 import api.model.ApiInstrument;
-import api.model.InstrumentInfo;
+import api.model.ApiInstrumentInfo;
 import core.MathHelper;
 import core.model.Exchange;
 import core.model.Instrument;
+import core.model.InstrumentInfo;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +24,7 @@ public class BittrexManagerImpl implements BittrexManager{
     }
 
     @Override
-    public List<Instrument> getPairs() {
+    public List<Instrument> getInstruments() {
         List<Instrument> ret = new ArrayList<>();
         List<ApiInstrument> apiInstruments = bittrexApi.getInstruments();
         for (ApiInstrument apiInstrument : apiInstruments) {
@@ -40,8 +42,15 @@ public class BittrexManagerImpl implements BittrexManager{
 
     @Override
     public Map<String, InstrumentInfo> getInstrumentInfo() {
-        bittrexApi.getInstrumentsInfo();
-        return null;
+        List<ApiInstrumentInfo> infoList = bittrexApi.getInstrumentsInfo();
+        Map<String,InstrumentInfo> ret = new HashMap<>();
+
+        for (ApiInstrumentInfo apiInfo : infoList){
+            InstrumentInfo unpackedInfo = ApiHelper.unpackApiInstrumentInfo(apiInfo,Exchange.BITTREX);
+            ret.put(apiInfo.getSymbol(),unpackedInfo);
+
+        }
+        return ret;
     }
 
     private double getIBuyFee(final ApiInstrument apiInstrument) {

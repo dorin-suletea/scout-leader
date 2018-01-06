@@ -1,9 +1,11 @@
 package api.exchanges;
 
 import api.model.ApiInstrument;
+import api.model.ApiInstrumentInfo;
 import core.model.Exchange;
 import core.model.Instrument;
 import core.model.InstrumentDirection;
+import core.model.InstrumentInfo;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,10 +52,15 @@ public class ApiHelper {
         return responseStr.toString();
     }
 
+    public static InstrumentInfo unpackApiInstrumentInfo(final ApiInstrumentInfo apiInstrumentInfo,
+                                                         final Exchange exchange) {
+        return new InstrumentInfo(apiInstrumentInfo.getSymbol(), apiInstrumentInfo.getWithdrawalFee(), apiInstrumentInfo.isActive(), exchange);
+    }
+
     public static List<Instrument> unpackApiInstrument(final ApiInstrument apiInstrument,
-                                                                   final double iBuyTradeFee,
-                                                                   final double iSellTradeFee,
-                                                                   final Exchange exchange) {
+                                                       final double iBuyTradeFee,
+                                                       final double iSellTradeFee,
+                                                       final Exchange exchange) {
         final Double iBuyPriceNoFee = apiInstrument.getIBuyPriceNoFee();
         final Double iSellPriceNoFee = apiInstrument.getISellPriceNoFee();
 

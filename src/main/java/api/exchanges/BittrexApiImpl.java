@@ -1,7 +1,7 @@
 package api.exchanges;
 
 import api.model.ApiInstrument;
-import api.model.InstrumentInfo;
+import api.model.ApiInstrumentInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,8 +39,8 @@ public class BittrexApiImpl implements BittrexApi {
     }
 
     @Override
-    public List<InstrumentInfo> getInstrumentsInfo() {
-        final List<ApiInstrument> ret = new ArrayList<>();
+    public List<ApiInstrumentInfo> getInstrumentsInfo() {
+        final List<ApiInstrumentInfo> ret = new ArrayList<>();
         try {
             String apiResponse = ApiHelper.sendGet(BittrexApi.WITHDRAWAL_FEES_URL);
             JSONArray results = new JSONObject(apiResponse).getJSONArray("result");
@@ -48,16 +48,17 @@ public class BittrexApiImpl implements BittrexApi {
                 JSONObject instrumentInfo = (JSONObject) results.get(i);
 
                 final String symbol = instrumentInfo.getString("Currency");
-                final 
+                final double withdrawalFee = instrumentInfo.getDouble("TxFee");
+                final boolean enabled = instrumentInfo.getBoolean("IsActive");
 
-                System.out.print(apiResponse);
+                ApiInstrumentInfo info = new ApiInstrumentInfo(symbol, withdrawalFee, enabled);
+                ret.add(info);
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return ret;
     }
 }

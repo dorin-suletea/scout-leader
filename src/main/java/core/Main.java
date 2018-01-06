@@ -10,7 +10,7 @@ public class Main {
         BittrexManager bittrexManager = RuntimeModule.getInjectedObject(BittrexManager.class);
 //        ApiFactoryImpl apiFact = RuntimeModule.getInjectedObject(ApiFactoryImpl.class);
 
-        bittrexManager.getWithdrawFeeMap();
-        System.out.println(bittrexManager.getPairs());
+
+        System.out.println(bittrexManager.getInstrumentInfo());
     }
 }

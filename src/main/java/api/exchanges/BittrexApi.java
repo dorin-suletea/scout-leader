@@ -1,7 +1,7 @@
 package api.exchanges;
 
 import api.model.ApiInstrument;
-import api.model.InstrumentInfo;
+import api.model.ApiInstrumentInfo;
 
 import java.util.List;
 
@@ -14,5 +14,5 @@ public interface BittrexApi {
     String WITHDRAWAL_FEES_URL = BITTREX_URL + "/public/getcurrencies";
 
     List<ApiInstrument> getInstruments();
-    List<InstrumentInfo> getInstrumentsInfo();
+    List<ApiInstrumentInfo> getInstrumentsInfo();
 }
