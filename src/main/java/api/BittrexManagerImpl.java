@@ -1,9 +1,8 @@
 package api;
 
-import api.exchanges.ApiFactoryImpl;
 import api.exchanges.ApiHelper;
-import api.model.ApiInstrument;
 import api.exchanges.BittrexApi;
+import api.model.ApiInstrument;
 import core.MathHelper;
 import core.model.Exchange;
 import core.model.Instrument;
@@ -18,8 +17,8 @@ public class BittrexManagerImpl implements BittrexManager{
     private final BittrexApi bittrexApi;
 
     @Inject
-    public BittrexManagerImpl(final ApiFactoryImpl apiFactory){
-        this.bittrexApi = apiFactory.makeBittrexApi();
+    public BittrexManagerImpl(final BittrexApi bittrexApi){
+        this.bittrexApi = bittrexApi;
     }
 
     @Override

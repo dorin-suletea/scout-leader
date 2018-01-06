@@ -16,9 +16,7 @@ public class RuntimeModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(ApiFactory.class).to(ApiFactoryImpl.class);
-        bind(ApiDecoder.class).to(ApiDecoderImpl.class);
-
+        bind(BittrexApi.class).to(BittrexApiImpl.class);
         bind(BittrexManager.class).to(BittrexManagerImpl.class);
     }
 
