@@ -77,7 +77,7 @@ public class ApiHelper {
         final Instrument sellInstrument = new Instrument(
                 apiInstrument.getRightSymbol(),
                 apiInstrument.getLeftSymbol(),
-                iSellPrice,
+                1 / iSellPrice,
                 InstrumentDirection.SELL,
                 exchange);
 

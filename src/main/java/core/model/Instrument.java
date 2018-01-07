@@ -59,4 +59,24 @@ public class Instrument {
                 ", instrumentDirection=" + instrumentDirection +
                 '}';
     }
+
+    public String getLeftSymbol() {
+        return leftSymbol;
+    }
+
+    public String getRightSymbol() {
+        return rightSymbol;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public InstrumentDirection getInstrumentDirection() {
+        return instrumentDirection;
+    }
+
+    public Exchange getExchange() {
+        return exchange;
+    }
 }

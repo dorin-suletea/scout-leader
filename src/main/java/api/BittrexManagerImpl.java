@@ -10,16 +10,13 @@ import core.model.Instrument;
 import core.model.InstrumentInfo;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class BittrexManagerImpl implements BittrexManager{
+public class BittrexManagerImpl implements BittrexManager {
     private final BittrexApi bittrexApi;
 
     @Inject
-    public BittrexManagerImpl(final BittrexApi bittrexApi){
+    public BittrexManagerImpl(final BittrexApi bittrexApi) {
         this.bittrexApi = bittrexApi;
     }
 
@@ -32,25 +29,30 @@ public class BittrexManagerImpl implements BittrexManager{
                     apiInstrument,
                     getIBuyFee(apiInstrument),
                     getISellFee(apiInstrument),
-                    Exchange.BITTREX);
+                    this.getExchange());
 
             ret.addAll(unpackedInstruments);
         }
 
-        return ret;
+        return Collections.unmodifiableList(ret);
     }
 
     @Override
     public Map<String, InstrumentInfo> getInstrumentInfo() {
         List<ApiInstrumentInfo> infoList = bittrexApi.getInstrumentsInfo();
-        Map<String,InstrumentInfo> ret = new HashMap<>();
+        Map<String, InstrumentInfo> ret = new HashMap<>();
 
-        for (ApiInstrumentInfo apiInfo : infoList){
-            InstrumentInfo unpackedInfo = ApiHelper.unpackApiInstrumentInfo(apiInfo,Exchange.BITTREX);
-            ret.put(apiInfo.getSymbol(),unpackedInfo);
+        for (ApiInstrumentInfo apiInfo : infoList) {
+            InstrumentInfo unpackedInfo = ApiHelper.unpackApiInstrumentInfo(apiInfo, this.getExchange());
+            ret.put(apiInfo.getSymbol(), unpackedInfo);
 
         }
-        return ret;
+        return Collections.unmodifiableMap(ret);
+    }
+
+    @Override
+    public Exchange getExchange() {
+        return Exchange.BITTREX;
     }
 
     private double getIBuyFee(final ApiInstrument apiInstrument) {
