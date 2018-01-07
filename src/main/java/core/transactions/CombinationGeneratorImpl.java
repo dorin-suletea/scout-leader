@@ -75,7 +75,7 @@ public class CombinationGeneratorImpl implements CombinationGenerator {
                 // # of locations to insert is largest index + 1
                 for (int j = 0; j < l.size() + 1; j++) {
                     // + add num[i] to different locations
-                    l.add(j, num.get(i);
+                    l.add(j, num.get(i));
 
                     ArrayList<Integer> temp = new ArrayList<Integer>(l);
                     current.add(temp);
@@ -98,6 +98,9 @@ public class CombinationGeneratorImpl implements CombinationGenerator {
         nums.add(1);
         nums.add(2);
         nums.add(3);
-        List<List<Integer>> out = getCombinations2()
+        List<List<Integer>> out = getCombinations2(nums);
+        for (List<Integer> r : out){
+            System.out.println(r);
+        }
     }
 }
