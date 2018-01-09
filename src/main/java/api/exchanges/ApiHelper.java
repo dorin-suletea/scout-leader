@@ -1,20 +1,15 @@
 package api.exchanges;
 
-import api.model.ApiInstrument;
-import api.model.ApiInstrumentInfo;
-import core.model.Exchange;
-import core.model.Instrument;
-import core.model.InstrumentDirection;
-import core.model.InstrumentInfo;
-
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by next on 12/21/17.
@@ -42,6 +37,29 @@ public class ApiHelper {
         return ret.toString();
     }
 
+
+    public static String sendGetWithSSLCert(final String requestUrl) throws Exception {
+        TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                }
+        };
+        SSLContext sc = SSLContext.getInstance("SSL");
+        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        return sendGet(requestUrl);
+    }
+
     public static String getStreamContent(final InputStream inputStream) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         StringBuilder responseStr = new StringBuilder();
@@ -51,41 +69,4 @@ public class ApiHelper {
         }
         return responseStr.toString();
     }
-
-    public static InstrumentInfo unpackApiInstrumentInfo(final ApiInstrumentInfo apiInstrumentInfo,
-                                                         final Exchange exchange) {
-        return new InstrumentInfo(apiInstrumentInfo.getSymbol(), apiInstrumentInfo.getWithdrawalFee(), apiInstrumentInfo.isActive(), exchange);
-    }
-
-    public static List<Instrument> unpackApiInstrument(final ApiInstrument apiInstrument,
-                                                       final double iBuyTradeFee,
-                                                       final double iSellTradeFee,
-                                                       final Exchange exchange) {
-        final Double iBuyPriceNoFee = apiInstrument.getIBuyPriceNoFee();
-        final Double iSellPriceNoFee = apiInstrument.getISellPriceNoFee();
-
-        final Double iBuyPrice = iBuyPriceNoFee + iBuyTradeFee;
-        final Double iSellPrice = iSellPriceNoFee - iSellTradeFee;
-
-        final Instrument buyInstrument = new Instrument(
-                apiInstrument.getLeftSymbol(),
-                apiInstrument.getRightSymbol(),
-                iBuyPrice,
-                InstrumentDirection.BUY,
-                exchange);
-
-        final Instrument sellInstrument = new Instrument(
-                apiInstrument.getRightSymbol(),
-                apiInstrument.getLeftSymbol(),
-                1 / iSellPrice,
-                InstrumentDirection.SELL,
-                exchange);
-
-
-        List<Instrument> ret = new ArrayList<>();
-        ret.add(buyInstrument);
-        ret.add(sellInstrument);
-        return ret;
-    }
-
 }

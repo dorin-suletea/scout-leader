@@ -1,6 +1,6 @@
 package api;
 
-import api.exchanges.BittrexApi;
+import api.exchanges.BinanceApi;
 import api.model.ApiInstrument;
 import api.model.ApiInstrumentInfo;
 import core.MathHelper;
@@ -14,18 +14,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class BittrexManagerImpl implements BittrexManager {
-    private final BittrexApi bittrexApi;
+public class BinanceManagerImpl implements BinanceManager {
+    private final BinanceApi binanceApi;
 
     @Inject
-    public BittrexManagerImpl(final BittrexApi bittrexApi) {
-        this.bittrexApi = bittrexApi;
+    public BinanceManagerImpl(final BinanceApi binanceApi) {
+        this.binanceApi = binanceApi;
     }
 
     @Override
     public List<Instrument> getInstruments() {
         List<Instrument> ret = new ArrayList<>();
-        List<ApiInstrument> apiInstruments = bittrexApi.getInstruments();
+        List<ApiInstrument> apiInstruments = binanceApi.getInstruments();
         for (ApiInstrument apiInstrument : apiInstruments) {
             List<Instrument> unpackedInstruments = ApiDataObjectHelper.unpackApiInstrument(
                     apiInstrument,
@@ -37,24 +37,25 @@ public class BittrexManagerImpl implements BittrexManager {
         }
 
         return Collections.unmodifiableList(ret);
+
     }
 
     @Override
     public Map<String, InstrumentInfo> getInstrumentInfo() {
-        List<ApiInstrumentInfo> infoList = bittrexApi.getInstrumentsInfo();
+        List<ApiInstrumentInfo> infoList = binanceApi.getInstrumentsInfo();
         return ApiDataObjectHelper.toInstrumentInfoMap(infoList, this.getExchange());
     }
 
     @Override
     public Exchange getExchange() {
-        return Exchange.BITTREX;
+        return Exchange.BINANCE;
     }
 
     private double getIBuyFee(final ApiInstrument apiInstrument) {
-        return MathHelper.percentOf(Exchange.BITTREX.getExchangeFee(), apiInstrument.getIBuyPriceNoFee());
+        return MathHelper.percentOf(Exchange.BINANCE.getExchangeFee(), apiInstrument.getIBuyPriceNoFee());
     }
 
     private double getISellFee(final ApiInstrument apiInstrument) {
-        return MathHelper.percentOf(Exchange.BITTREX.getExchangeFee(), apiInstrument.getISellPriceNoFee());
+        return MathHelper.percentOf(Exchange.BINANCE.getExchangeFee(), apiInstrument.getISellPriceNoFee());
     }
 }

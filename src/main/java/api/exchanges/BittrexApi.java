@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by next on 12/20/17.
  */
-public interface BittrexApi {
+public interface BittrexApi extends ExchangeApi{
     String BITTREX_URL = "https://bittrex.com/api/v1.1";
     String INSTRUMENTS_URL = BITTREX_URL + "/public/getmarketsummaries";
     String WITHDRAWAL_FEES_URL = BITTREX_URL + "/public/getcurrencies";
