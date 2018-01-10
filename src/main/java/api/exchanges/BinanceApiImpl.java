@@ -56,6 +56,7 @@ public class BinanceApiImpl implements BinanceApi {
         return new HashMap<String, Double>() {{
             put("BNB", 1d);
             put("BTC", 0.001);
+            put("BTG", 0.001);
             put("ETH", 0.01);
             put("LTC", 0.01);
             put("NEO", 0d);
@@ -98,7 +99,7 @@ public class BinanceApiImpl implements BinanceApi {
             put("VIB", 20d);
             put("HSR", 0.0001);
             put("TRX", 100d);
-            put("POWE", 5d);
+            put("POWR", 8d);
             put("ARK", 0.1);
             put("YOYO", 10d);
             put("XRP", 0.15);
@@ -150,6 +151,7 @@ public class BinanceApiImpl implements BinanceApi {
             put("WINGS", 3d);
             put("NAV", 0.2);
             put("LUN", 0.3);
+            put("TRIG", 5d);
         }};
     }
 }

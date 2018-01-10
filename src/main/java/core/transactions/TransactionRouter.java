@@ -6,5 +6,5 @@ import core.model.transaction.TransactionChainAndChainResult;
 import java.util.List;
 
 public interface TransactionRouter {
-    List<TransactionChainAndChainResult> getTradeChains(final Exchange baseExchange, final String baseCurrency, final double baseCurrencyDeposit);
+    List<TransactionChainAndChainResult> getTradeChains(final Exchange baseExchange, final String baseCoin, final double baseCurrencyDeposit);
 }

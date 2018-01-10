@@ -6,7 +6,7 @@ import api.model.ApiInstrumentInfo;
 import core.MathHelper;
 import core.model.Exchange;
 import core.model.Instrument;
-import core.model.InstrumentInfo;
+import core.model.CoinInfo;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class BittrexManagerImpl implements BittrexManager {
     }
 
     @Override
-    public Map<String, InstrumentInfo> getInstrumentInfo() {
+    public Map<String, CoinInfo> getInstrumentInfo() {
         List<ApiInstrumentInfo> infoList = bittrexApi.getInstrumentsInfo();
         return ApiDataObjectHelper.toInstrumentInfoMap(infoList, this.getExchange());
     }

@@ -2,22 +2,22 @@ package api;
 
 import api.model.ApiInstrument;
 import api.model.ApiInstrumentInfo;
+import core.model.CoinInfo;
 import core.model.Exchange;
 import core.model.Instrument;
 import core.model.InstrumentDirection;
-import core.model.InstrumentInfo;
 
 import java.util.*;
 
 public class ApiDataObjectHelper {
-    public static InstrumentInfo unpackApiInstrumentInfo(final ApiInstrumentInfo apiInstrumentInfo, final Exchange exchange) {
-        return new InstrumentInfo(apiInstrumentInfo.getSymbol(), apiInstrumentInfo.getWithdrawalFee(), apiInstrumentInfo.isActive(), exchange);
+    public static CoinInfo unpackApiInstrumentInfo(final ApiInstrumentInfo apiInstrumentInfo, final Exchange exchange) {
+        return new CoinInfo(apiInstrumentInfo.getSymbol(), apiInstrumentInfo.getWithdrawalFee(), apiInstrumentInfo.isActive(), exchange);
     }
 
-    public static Map<String, InstrumentInfo> toInstrumentInfoMap(final List<ApiInstrumentInfo> instrumentInfoList, final Exchange exchange) {
-        Map<String, InstrumentInfo> ret = new HashMap<>();
+    public static Map<String, CoinInfo> toInstrumentInfoMap(final List<ApiInstrumentInfo> instrumentInfoList, final Exchange exchange) {
+        Map<String, CoinInfo> ret = new HashMap<>();
         for (ApiInstrumentInfo apiInfo : instrumentInfoList) {
-            InstrumentInfo unpackedInfo = ApiDataObjectHelper.unpackApiInstrumentInfo(apiInfo, exchange);
+            CoinInfo unpackedInfo = ApiDataObjectHelper.unpackApiInstrumentInfo(apiInfo, exchange);
             ret.put(apiInfo.getSymbol(), unpackedInfo);
 
         }

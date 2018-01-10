@@ -4,9 +4,9 @@ import api.exchanges.BinanceApi;
 import api.model.ApiInstrument;
 import api.model.ApiInstrumentInfo;
 import core.MathHelper;
+import core.model.CoinInfo;
 import core.model.Exchange;
 import core.model.Instrument;
-import core.model.InstrumentInfo;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class BinanceManagerImpl implements BinanceManager {
     }
 
     @Override
-    public Map<String, InstrumentInfo> getInstrumentInfo() {
+    public Map<String, CoinInfo> getInstrumentInfo() {
         List<ApiInstrumentInfo> infoList = binanceApi.getInstrumentsInfo();
         return ApiDataObjectHelper.toInstrumentInfoMap(infoList, this.getExchange());
     }

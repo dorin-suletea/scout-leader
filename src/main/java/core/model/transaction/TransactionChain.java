@@ -10,6 +10,10 @@ public class TransactionChain implements Transaction {
         chain = new ArrayList<>();
     }
 
+    public TransactionChain(final List<Transaction> transactions) {
+        chain = new ArrayList<>(transactions);
+    }
+
     public void addToChain(final Transaction transactionToAdd) {
         chain.add(transactionToAdd);
     }
