@@ -1,10 +1,14 @@
 package mocks;
 
+import api.ExchangeManager;
+import core.model.CoinInfo;
 import core.model.Instrument;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class MockManager {
+public abstract class MockManager implements ExchangeManager {
     private final List<Instrument> instruments;
 
     public MockManager(final List<Instrument> instruments) {
@@ -16,12 +20,11 @@ public class MockManager {
     }
 
 
-    //TODO, fix this so you can pass the exchange
     public Map<String, CoinInfo> getCoinInfo() {
         Map<String, CoinInfo> ret = new HashMap<>();
         for (Instrument i : instruments) {
-            ret.put(i.getLeftSymbol(), new CoinInfo(i.getLeftSymbol(), 0, true, Exchange.BINANCE));
-            ret.put(i.getRightSymbol(), new CoinInfo(i.getRightSymbol(), 0, true, Exchange.BINANCE));
+            ret.put(i.getLeftSymbol(), new CoinInfo(i.getLeftSymbol(), 0, true, this.getExchange()));
+            ret.put(i.getRightSymbol(), new CoinInfo(i.getRightSymbol(), 0, true, this.getExchange()));
         }
         return ret;
     }

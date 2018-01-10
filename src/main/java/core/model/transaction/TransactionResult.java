@@ -2,9 +2,9 @@ package core.model.transaction;
 
 public class TransactionResult {
     private final String resultCoin;
-    private final double coinCount;
+    private final Double coinCount;
 
-    public TransactionResult(final String resultCoin, final double coinCount) {
+    public TransactionResult(final String resultCoin, final Double coinCount) {
         this.resultCoin = resultCoin;
         this.coinCount = coinCount;
     }
@@ -13,7 +13,12 @@ public class TransactionResult {
         return resultCoin;
     }
 
-    public double getCoinCount() {
+    public Double getCoinCount() {
         return coinCount;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + getCoinCount() + " " + getResultCoin() + ")";
     }
 }

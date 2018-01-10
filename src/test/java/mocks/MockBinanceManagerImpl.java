@@ -16,8 +16,6 @@ public class MockBinanceManagerImpl extends MockManager implements BinanceManage
         return super.getInstruments();
     }
 
-
-
     @Override
     public Exchange getExchange() {
         return Exchange.BINANCE;

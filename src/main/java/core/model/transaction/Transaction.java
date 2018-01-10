@@ -8,4 +8,6 @@ public interface Transaction {
      * does not account for pair prices
      */
     String getSignature();
+
+    String toDebugString(final double inputCoinCount);
 }

@@ -11,6 +11,7 @@ import core.transactions.TransactionRouter;
 import core.transactions.TransactionRouterImpl;
 import mocks.MockBinanceManagerImpl;
 import mocks.MockBittrexManagerImpl;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class TransactionRouterTest {
 
     private final Exchange baseExchange = Exchange.BITTREX;
     private final String inputCoin = "ETH";
-    private final int deposit = 1;
+    private final Double deposit = 10d;
 
 
     private void withNewInjector() {
@@ -49,16 +50,16 @@ public class TransactionRouterTest {
     @Test
     public void testTradeStartsWithBaseCurrencyInBaseExchange() {
         withInstruments(
-                Arrays.asList(new Instrument("ETH","BTC",0d, InstrumentDirection.BUY,Exchange.BITTREX)),
-                Arrays.asList(new Instrument("BTC","ETH",0d, InstrumentDirection.SELL,Exchange.BINANCE))
+                Arrays.asList(new Instrument("ETH","BTC",1d, InstrumentDirection.BUY,Exchange.BITTREX)),
+                Arrays.asList(new Instrument("BTC","ETH",1d, InstrumentDirection.SELL,Exchange.BINANCE))
         );
         withNewInjector();
 
         TransactionRouter router = injector.getInstance(TransactionRouter.class);
         List<TransactionChainAndChainResult> chainAndChainResult = router.getTradeChains(baseExchange, inputCoin, deposit);
 
-
-
-        System.out.print(router);
+        Assert.assertEquals(1,chainAndChainResult.size());
+        Assert.assertEquals(deposit,chainAndChainResult.get(0).getChainRunResult().getCoinCount());
+        Assert.assertEquals(inputCoin,chainAndChainResult.get(0).getChainRunResult().getResultCoin());
     }
 }

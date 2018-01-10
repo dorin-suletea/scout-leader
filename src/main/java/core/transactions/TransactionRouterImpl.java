@@ -46,13 +46,21 @@ public class TransactionRouterImpl implements TransactionRouter {
         final boolean tradeStartCoinIsBaseCoin = trade.getFrom().getLeftSymbol().equals(baseCoin);
         final boolean tradeStartExchangeIsBaseExchange = trade.getFrom().getLeftSymbol().equals(baseCoin);
         List<Transaction> transactionsForTradeExecution = tradeAsTransactions(trade);
+        if (!trade.getTo().getRightSymbol().equals(baseCoin)) {
+            Transaction toBaseCoinTransaction = exchangeCoins(trade.getTo().getExchange(), trade.getTo().getRightSymbol(), baseCoin);
+            //if there is no way to convert the resulting coin into base coin, chain is not accepted, return empty
+            if (toBaseCoinTransaction == null) {
+                return ret;
+            }
+            transactionsForTradeExecution.add(toBaseCoinTransaction);
+        }
 
 
         //if both need to convert and transfer send; create 2 chains convert->send and send->convert
         if (!tradeStartCoinIsBaseCoin && !tradeStartExchangeIsBaseExchange) {
             TransactionChain convertAndSendChain = new TransactionChain();
             Transaction exchangeTransaction1 = exchangeCoins(baseExchange, baseCoin, trade.getFrom().getLeftSymbol());
-            Transaction transferTransaction1 = transferCoins(trade.getFrom().getLeftSymbol(), trade.getFrom().getExchange(), trade.getTo().getExchange());
+            Transaction transferTransaction1 = transferCoins(trade.getFrom().getLeftSymbol(), baseExchange, trade.getFrom().getExchange());
             if (exchangeTransaction1 != null) {
                 convertAndSendChain.addToChain(exchangeTransaction1);
                 convertAndSendChain.addToChain(transferTransaction1);
@@ -61,7 +69,7 @@ public class TransactionRouterImpl implements TransactionRouter {
             }
             TransactionChain sendAndConvert = new TransactionChain();
             Transaction transferTransaction2 = transferCoins(baseCoin, baseExchange, trade.getFrom().getExchange());
-            Transaction exchangeTransaction2 = exchangeCoins(trade.getTo().getExchange(), baseCoin, trade.getFrom().getLeftSymbol());
+            Transaction exchangeTransaction2 = exchangeCoins(trade.getFrom().getExchange(), baseCoin, trade.getFrom().getLeftSymbol());
             if (exchangeTransaction2 != null) {
                 sendAndConvert.addToChain(transferTransaction2);
                 sendAndConvert.addToChain(exchangeTransaction2);
@@ -96,9 +104,10 @@ public class TransactionRouterImpl implements TransactionRouter {
     private List<Transaction> tradeAsTransactions(final Trade trade) {
         List<Transaction> ret = new ArrayList<>();
         Transaction legOneOfTrade = new ExchangeTransaction(trade.getFrom());
+
         ret.add(legOneOfTrade);
         if (trade.getFrom().getExchange() != trade.getTo().getExchange()) {
-            Transaction transfer = transferCoins(trade.getFrom().getLeftSymbol(), trade.getFrom().getExchange(), trade.getTo().getExchange());
+            Transaction transfer = transferCoins(trade.getFrom().getRightSymbol(), trade.getFrom().getExchange(), trade.getTo().getExchange());
             ret.add(transfer);
         }
         Transaction legTwoOfTrade = new ExchangeTransaction(trade.getTo());

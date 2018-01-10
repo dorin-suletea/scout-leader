@@ -45,10 +45,10 @@ public class TransactionChain implements Transaction {
     }
 
     @Override
-    public String toString() {
+    public String toDebugString(final double inputCoinCount) {
         StringBuilder ret = new StringBuilder();
         for (Transaction transaction : chain) {
-            ret.append(transaction.toString() + "\n");
+            ret.append(transaction.toDebugString(inputCoinCount) + "\n");
         }
         return ret.toString();
     }

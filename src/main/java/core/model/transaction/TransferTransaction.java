@@ -25,11 +25,11 @@ public class TransferTransaction implements Transaction {
 
     @Override
     public String getSignature() {
-        return "Transfer " + coinSymbol + "" + fromExchange + " " + toExchange + " ";
+        return "Trans : " + coinSymbol + "" + fromExchange + " -- " + toExchange + " ";
     }
 
-    @Override
-    public String toString() {
-        return coinSymbol + " " + fromExchange + " ---> " + toExchange + " ( " + withdrawalFee + " ) ";
+    public String toDebugString(final double inputCoinCount) {
+        final TransactionResult transactionResult = getTransactionOutput(inputCoinCount);
+        return "Transfer : " + coinSymbol + " " + fromExchange + " -- " + toExchange + " " + transactionResult;
     }
 }

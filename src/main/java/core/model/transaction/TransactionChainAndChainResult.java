@@ -19,12 +19,11 @@ public class TransactionChainAndChainResult {
         return chainRunResult;
     }
 
-    @Override
-    public String toString() {
+    public String toDebugString(final double inputCoinCount) {
         StringBuilder ret = new StringBuilder();
-        ret.append("-----------------------------\n");
-        ret.append(chain.toString()+"\n");
-        ret.append("Result : " + chainRunResult.getCoinCount()+ " " + chainRunResult.getResultCoin());
+        ret.append("\n-----------------------------\n");
+        ret.append(chain.toDebugString(inputCoinCount));
+        ret.append("Output   : " + chainRunResult.getCoinCount() + " " + chainRunResult.getResultCoin() + "\n");
         return ret.toString();
     }
 

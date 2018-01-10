@@ -1,6 +1,5 @@
 package core.model.transaction;
 
-import core.StringHelper;
 import core.model.Instrument;
 
 public class ExchangeTransaction implements Transaction {
@@ -20,12 +19,12 @@ public class ExchangeTransaction implements Transaction {
 
     @Override
     public String getSignature() {
-        return "Exchange " + instrument.getExchange() + " " + instrument.getInstrumentDirection() + " " + instrument.getRightSymbol() + " " + instrument.getLeftSymbol() + " ";
+        return "Trade : " + instrument.getLeftSymbol() + " --- " + instrument.getRightSymbol();
     }
 
-    @Override
-    public String toString() {
-        return instrument.getExchange() + " " + instrument.getRightSymbol() + " == " + instrument.getLeftSymbol() + " ( " + StringHelper.formattedDouble(instrument.getPrice()) + " ) ";
+    public String toDebugString(final double inputCoinCount) {
+        final TransactionResult transactionResult = getTransactionOutput(inputCoinCount);
+        return "Exchange : " + instrument.getLeftSymbol() + " --- " + instrument.getRightSymbol() + " " + transactionResult.toString() + " " + instrument.getExchange() + " DEBIG "+instrument;
     }
 
 }
