@@ -9,6 +9,6 @@ import java.util.Map;
 
 public interface ExchangeManager {
     List<Instrument> getInstruments();
-    Map<String, CoinInfo> getInstrumentInfo();
+    Map<String, CoinInfo> getCoinInfo();
     Exchange getExchange();
 }

@@ -2,6 +2,7 @@ package core.transactions;
 
 import api.BinanceManager;
 import api.BittrexManager;
+import core.model.CoinInfo;
 import core.model.Exchange;
 import core.model.Instrument;
 import core.model.transaction.*;
@@ -33,7 +34,7 @@ public class TransactionRouterImpl implements TransactionRouter {
             allChains.addAll(chainsForTrade);
         }
 
-        List<TransactionChainAndChainResult> ret = runChains(allChains,baseCurrencyDeposit);
+        List<TransactionChainAndChainResult> ret = runChains(allChains, baseCurrencyDeposit);
 
         Collections.sort(ret, new TransactionChainAndChainResult.TransactionChainAndChainResultComparator());
         return ret;
@@ -107,7 +108,7 @@ public class TransactionRouterImpl implements TransactionRouter {
 
     private ExchangeTransaction exchangeCoins(final Exchange exchange, final String iHaveCoin, final String iWantCoin) {
         for (Instrument pair : exchangeData.getInstruments(exchange)) {
-            if (pair.getLeftSymbol().equals(iWantCoin) && pair.getRightSymbol().equals(iHaveCoin)) {
+            if (pair.getLeftSymbol().equals(iHaveCoin) && pair.getRightSymbol().equals(iWantCoin)) {
                 return new ExchangeTransaction(pair);
             }
         }
@@ -115,10 +116,8 @@ public class TransactionRouterImpl implements TransactionRouter {
     }
 
     private TransferTransaction transferCoins(final String coin, final Exchange fromExchange, final Exchange toExchange) {
-        if (coin==null || fromExchange==null || toExchange==null || exchangeData.getCoinInfo(coin, fromExchange)==null){
-            System.out.print("");
-        }
-        return new TransferTransaction(coin, exchangeData.getCoinInfo(coin, fromExchange).getWithdrawalFee(), fromExchange, toExchange);
+        final CoinInfo withdrawCoinInfo = exchangeData.getCoinInfo(coin, fromExchange);
+        return new TransferTransaction(coin, withdrawCoinInfo.getWithdrawalFee(), fromExchange, toExchange);
     }
 
 

@@ -41,7 +41,7 @@ public class BinanceManagerImpl implements BinanceManager {
     }
 
     @Override
-    public Map<String, CoinInfo> getInstrumentInfo() {
+    public Map<String, CoinInfo> getCoinInfo() {
         List<ApiInstrumentInfo> infoList = binanceApi.getInstrumentsInfo();
         return ApiDataObjectHelper.toInstrumentInfoMap(infoList, this.getExchange());
     }

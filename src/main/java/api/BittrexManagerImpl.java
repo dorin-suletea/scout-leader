@@ -40,7 +40,7 @@ public class BittrexManagerImpl implements BittrexManager {
     }
 
     @Override
-    public Map<String, CoinInfo> getInstrumentInfo() {
+    public Map<String, CoinInfo> getCoinInfo() {
         List<ApiInstrumentInfo> infoList = bittrexApi.getInstrumentsInfo();
         return ApiDataObjectHelper.toInstrumentInfoMap(infoList, this.getExchange());
     }

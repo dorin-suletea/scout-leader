@@ -18,7 +18,7 @@ public class ExchangeDataMap {
 
         for (ExchangeManager exchangeManager : exchangeManagers) {
             List<Instrument> instruments = exchangeManager.getInstruments();
-            Map<String, CoinInfo> instrumentInfoMap = exchangeManager.getInstrumentInfo();
+            Map<String, CoinInfo> instrumentInfoMap = exchangeManager.getCoinInfo();
             Exchange exchange = exchangeManager.getExchange();
             exchangeDataMap.put(exchange, new Pair<>(instruments, instrumentInfoMap));
         }
@@ -37,7 +37,8 @@ public class ExchangeDataMap {
     }
 
     public CoinInfo getCoinInfo(final String coin, final Exchange exchange) {
-        return exchangeDataMap.get(exchange).getSecond().get(coin);
+        final Map<String, CoinInfo> coinInfoMap = exchangeDataMap.get(exchange).getSecond();
+        return coinInfoMap.get(coin);
     }
 
 
