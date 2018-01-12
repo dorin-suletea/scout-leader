@@ -18,10 +18,10 @@ public class ExchangeDataMap {
     private final Map<Exchange, Pair<List<Instrument>, Map<String, CoinInfo>>> exchangeDataMap;
 
     @Inject
-    public ExchangeDataMap(final BittrexManager bittrexManager, final BinanceManager binanceManager){
+    public ExchangeDataMap(final BittrexManager bittrexManager, final BinanceManager binanceManager) {
         this.exchangeDataMap = new HashMap<>();
 
-        final List<ExchangeManager> exchangeManagers = Arrays.asList(bittrexManager,binanceManager);
+        final List<ExchangeManager> exchangeManagers = Arrays.asList(bittrexManager, binanceManager);
         for (ExchangeManager exchangeManager : exchangeManagers) {
             List<Instrument> instruments = exchangeManager.getInstruments();
             Map<String, CoinInfo> instrumentInfoMap = exchangeManager.getCoinInfo();
@@ -44,6 +44,10 @@ public class ExchangeDataMap {
 
     public CoinInfo getCoinInfo(final String coin, final Exchange exchange) {
         final Map<String, CoinInfo> coinInfoMap = exchangeDataMap.get(exchange).getSecond();
+        if (!coinInfoMap.containsKey(coin)) {
+            throw new RuntimeException("Unknown withdrawal fee for " + coin + " Exchange: " + exchange);
+        }
+
         return coinInfoMap.get(coin);
     }
 

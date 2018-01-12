@@ -11,8 +11,8 @@ import java.util.List;
  */
 public class Main {
     public static void main(String args[]) {
-        String baseCurrency = "XRP";
-        double deposit = 100;
+        String baseCurrency = "ETH";
+        double deposit = 1;
 
 
         TransactionRouter transactionRouter = RuntimeModule.getInjectedObject(TransactionRouter.class);

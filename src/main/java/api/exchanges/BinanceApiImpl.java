@@ -152,6 +152,7 @@ public class BinanceApiImpl implements BinanceApi {
             put("NAV", 0.2);
             put("LUN", 0.3);
             put("TRIG", 5d);
+            put("RLC", 3d);
         }};
     }
 }
