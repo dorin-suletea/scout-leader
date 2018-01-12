@@ -11,8 +11,9 @@ import api.exchanges.BittrexApiImpl;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import core.transactions.TransactionRouter;
-import core.transactions.TransactionRouterImpl;
+import core.transaction.ExchangeDataMap;
+import core.transaction.TransactionRouter;
+import core.transaction.TransactionRouterImpl;
 
 public class RuntimeModule extends AbstractModule {
     private static final Injector injector = Guice.createInjector(new RuntimeModule());
@@ -27,7 +28,7 @@ public class RuntimeModule extends AbstractModule {
         bind(BittrexManager.class).to(BittrexManagerImpl.class);
         bind(BinanceApi.class).to(BinanceApiImpl.class);
         bind(BinanceManager.class).to(BinanceManagerImpl.class);
-
+        bind(ExchangeDataMap.class);
         bind(TransactionRouter.class).to(TransactionRouterImpl.class);
 
     }

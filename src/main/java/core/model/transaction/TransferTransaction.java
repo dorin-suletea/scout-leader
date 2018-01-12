@@ -1,5 +1,6 @@
 package core.model.transaction;
 
+import core.Constants;
 import core.model.Exchange;
 
 public class TransferTransaction implements Transaction {
@@ -25,11 +26,11 @@ public class TransferTransaction implements Transaction {
 
     @Override
     public String getSignature() {
-        return "Trans : " + coinSymbol + "" + fromExchange + " -- " + toExchange + " ";
+        return this.getClass().getSimpleName() + " : " + coinSymbol + " " + fromExchange + " -- " + toExchange + " " + Constants.TRANSACTION_SIGNATURE_DELIMITER + " ";
     }
 
-    public String toDebugString(final double inputCoinCount) {
-        final TransactionResult transactionResult = getTransactionOutput(inputCoinCount);
-        return "Transfer : " + coinSymbol + " " + fromExchange + " -- " + toExchange + " " + transactionResult;
+    @Override
+    public String toString() {
+        return "Transfer : " + coinSymbol + " " + fromExchange + " -- " + toExchange + " ";
     }
 }

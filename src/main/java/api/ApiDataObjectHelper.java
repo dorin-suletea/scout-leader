@@ -37,14 +37,14 @@ public class ApiDataObjectHelper {
         final Instrument buyInstrument = new Instrument(
                 apiInstrument.getLeftSymbol(),
                 apiInstrument.getRightSymbol(),
-                iBuyPrice,
+                1/iBuyPrice,
                 InstrumentDirection.BUY,
                 exchange);
 
         final Instrument sellInstrument = new Instrument(
                 apiInstrument.getRightSymbol(),
                 apiInstrument.getLeftSymbol(),
-                1 / iSellPrice,
+                iSellPrice,
                 InstrumentDirection.SELL,
                 exchange);
 

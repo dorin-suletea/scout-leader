@@ -1,4 +1,4 @@
-package core.transactions;
+package core.transaction;
 
 import core.MathHelper;
 import core.model.Instrument;

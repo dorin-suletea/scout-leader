@@ -1,5 +1,7 @@
 package core.model.transaction;
 
+import core.StringHelper;
+
 public class TransactionResult {
     private final String resultCoin;
     private final Double coinCount;
@@ -19,6 +21,6 @@ public class TransactionResult {
 
     @Override
     public String toString() {
-        return "(" + getCoinCount() + " " + getResultCoin() + ")";
+        return "(" + StringHelper.formattedDouble(getCoinCount()) + " " + getResultCoin() + ")";
     }
 }

@@ -1,11 +1,15 @@
-package core.transactions;
+package core.transaction;
 
+import api.BinanceManager;
+import api.BittrexManager;
 import api.ExchangeManager;
 import core.model.CoinInfo;
 import core.model.Exchange;
 import core.model.Instrument;
 import org.apache.commons.math3.util.Pair;
 
+import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,9 +17,11 @@ import java.util.Map;
 public class ExchangeDataMap {
     private final Map<Exchange, Pair<List<Instrument>, Map<String, CoinInfo>>> exchangeDataMap;
 
-    public ExchangeDataMap(final List<ExchangeManager> exchangeManagers) {
+    @Inject
+    public ExchangeDataMap(final BittrexManager bittrexManager, final BinanceManager binanceManager){
         this.exchangeDataMap = new HashMap<>();
 
+        final List<ExchangeManager> exchangeManagers = Arrays.asList(bittrexManager,binanceManager);
         for (ExchangeManager exchangeManager : exchangeManagers) {
             List<Instrument> instruments = exchangeManager.getInstruments();
             Map<String, CoinInfo> instrumentInfoMap = exchangeManager.getCoinInfo();

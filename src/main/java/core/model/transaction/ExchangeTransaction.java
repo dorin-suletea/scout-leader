@@ -1,5 +1,6 @@
 package core.model.transaction;
 
+import core.Constants;
 import core.model.Instrument;
 
 public class ExchangeTransaction implements Transaction {
@@ -19,12 +20,12 @@ public class ExchangeTransaction implements Transaction {
 
     @Override
     public String getSignature() {
-        return "Trade : " + instrument.getLeftSymbol() + " --- " + instrument.getRightSymbol();
+        return this.getClass().getSimpleName() + " : " + instrument.getLeftSymbol() + " --- " + instrument.getRightSymbol() + " " + Constants.TRANSACTION_SIGNATURE_DELIMITER + " ";
     }
 
-    public String toDebugString(final double inputCoinCount) {
-        final TransactionResult transactionResult = getTransactionOutput(inputCoinCount);
-        return "Exchange : " + instrument.getLeftSymbol() + " --- " + instrument.getRightSymbol() + " " + transactionResult.toString() + " " + instrument.getExchange() + " DEBIG "+instrument;
+    @Override
+    public String toString() {
+        return "Exchange : " + instrument.getLeftSymbol() + " --- " + instrument.getRightSymbol() + " " + instrument.getExchange() + " [Price " + instrument.getPrice()+"]";
     }
 
 }

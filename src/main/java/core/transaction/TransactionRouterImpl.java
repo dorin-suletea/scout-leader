@@ -1,7 +1,5 @@
-package core.transactions;
+package core.transaction;
 
-import api.BinanceManager;
-import api.BittrexManager;
 import core.model.CoinInfo;
 import core.model.Exchange;
 import core.model.Instrument;
@@ -9,7 +7,6 @@ import core.model.transaction.*;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,8 +17,8 @@ public class TransactionRouterImpl implements TransactionRouter {
     private final ExchangeDataMap exchangeData;
 
     @Inject
-    public TransactionRouterImpl(final BittrexManager bittrexManager, final BinanceManager binanceManager) {
-        exchangeData = new ExchangeDataMap(Arrays.asList(bittrexManager, binanceManager));
+    public TransactionRouterImpl(final ExchangeDataMap exchangeData) {
+        this.exchangeData = exchangeData;
     }
 
     @Override
@@ -44,11 +41,10 @@ public class TransactionRouterImpl implements TransactionRouter {
         List<TransactionChain> ret = new ArrayList<>();
 
         final boolean tradeStartCoinIsBaseCoin = trade.getFrom().getLeftSymbol().equals(baseCoin);
-        final boolean tradeStartExchangeIsBaseExchange = trade.getFrom().getLeftSymbol().equals(baseCoin);
+        final boolean tradeStartExchangeIsBaseExchange = trade.getFrom().getExchange().equals(baseExchange);
         List<Transaction> transactionsForTradeExecution = tradeAsTransactions(trade);
         if (!trade.getTo().getRightSymbol().equals(baseCoin)) {
             Transaction toBaseCoinTransaction = exchangeCoins(trade.getTo().getExchange(), trade.getTo().getRightSymbol(), baseCoin);
-            //if there is no way to convert the resulting coin into base coin, chain is not accepted, return empty
             if (toBaseCoinTransaction == null) {
                 return ret;
             }
@@ -80,10 +76,13 @@ public class TransactionRouterImpl implements TransactionRouter {
         }
         if (!tradeStartCoinIsBaseCoin) {
             Transaction exchangeTransaction = exchangeCoins(trade.getFrom().getExchange(), baseCoin, trade.getFrom().getLeftSymbol());
-            TransactionChain convertAndExecute = new TransactionChain();
-            convertAndExecute.addToChain(exchangeTransaction);
-            convertAndExecute.addToChain(transactionsForTradeExecution);
-            ret.add(convertAndExecute);
+            if (exchangeTransaction != null) {
+                TransactionChain convertAndExecute = new TransactionChain();
+                convertAndExecute.addToChain(exchangeTransaction);
+                convertAndExecute.addToChain(transactionsForTradeExecution);
+                ret.add(convertAndExecute);
+            }
+
             return ret;
         }
         if (!tradeStartExchangeIsBaseExchange) {

@@ -1,25 +1,26 @@
 package core.model.transaction;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TransactionChain implements Transaction {
-    private final List<Transaction> chain;
+    private final List<Transaction> transactions;
 
     public TransactionChain() {
-        chain = new ArrayList<>();
+        transactions = new ArrayList<>();
     }
 
     public TransactionChain(final List<Transaction> transactions) {
-        chain = new ArrayList<>(transactions);
+        this.transactions = new ArrayList<>(transactions);
     }
 
     public void addToChain(final Transaction transactionToAdd) {
-        chain.add(transactionToAdd);
+        transactions.add(transactionToAdd);
     }
 
     public void addToChain(final List<Transaction> transactionToAdd) {
-        chain.addAll(transactionToAdd);
+        transactions.addAll(transactionToAdd);
     }
 
     @Override
@@ -27,8 +28,8 @@ public class TransactionChain implements Transaction {
         double inputForNextTrade = baseCurrencyDeposit;
 
         TransactionResult transactionResult = null;
-        for (Transaction trade : chain) {
-            transactionResult = trade.getTransactionOutput(inputForNextTrade);
+        for (Transaction transaction : transactions) {
+            transactionResult = transaction.getTransactionOutput(inputForNextTrade);
             inputForNextTrade = transactionResult.getCoinCount();
         }
 
@@ -38,18 +39,27 @@ public class TransactionChain implements Transaction {
     @Override
     public String getSignature() {
         StringBuilder ret = new StringBuilder();
-        for (Transaction t : chain) {
+        for (Transaction t : transactions) {
             ret.append(t.getSignature());
         }
         return ret.toString();
     }
 
-    @Override
+
     public String toDebugString(final double inputCoinCount) {
         StringBuilder ret = new StringBuilder();
-        for (Transaction transaction : chain) {
-            ret.append(transaction.toDebugString(inputCoinCount) + "\n");
+        double inputForNextTrade = inputCoinCount;
+        TransactionResult transactionResult;
+
+        for (Transaction transaction : transactions) {
+            transactionResult = transaction.getTransactionOutput(inputForNextTrade);
+            inputForNextTrade = transactionResult.getCoinCount();
+            ret.append(transaction.toString()+" "+transactionResult+" "+"\n");
         }
         return ret.toString();
+    }
+
+    public List<Transaction> getTransactions() {
+        return Collections.unmodifiableList(transactions);
     }
 }
