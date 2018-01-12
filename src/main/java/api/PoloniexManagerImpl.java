@@ -1,6 +1,6 @@
 package api;
 
-import api.exchanges.BinanceApi;
+import api.exchanges.PoloniexApi;
 import api.model.ApiInstrumentInfo;
 import core.model.CoinInfo;
 import core.model.Exchange;
@@ -9,11 +9,11 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
-public class BinanceManagerImpl extends ExchangeManagerBase implements BinanceManager {
+public class PoloniexManagerImpl extends ExchangeManagerBase implements PoloniexManager {
 
     @Inject
-    public BinanceManagerImpl(final BinanceApi binanceApi) {
-        super(binanceApi);
+    public PoloniexManagerImpl(final PoloniexApi poloniexApi) {
+        super(poloniexApi);
     }
 
     @Override
@@ -24,6 +24,7 @@ public class BinanceManagerImpl extends ExchangeManagerBase implements BinanceMa
 
     @Override
     public Exchange getExchange() {
-        return Exchange.BINANCE;
+        return Exchange.POLONIEX;
     }
+
 }

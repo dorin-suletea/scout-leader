@@ -11,7 +11,7 @@ import java.util.List;
 public interface BittrexApi extends ExchangeApi{
     String BITTREX_URL = "https://bittrex.com/api/v1.1";
     String INSTRUMENTS_URL = BITTREX_URL + "/public/getmarketsummaries";
-    String WITHDRAWAL_FEES_URL = BITTREX_URL + "/public/getcurrencies";
+    String COIN_INFO_URL = BITTREX_URL + "/public/getcurrencies";
 
     List<ApiInstrument> getInstruments();
     List<ApiInstrumentInfo> getInstrumentsInfo();

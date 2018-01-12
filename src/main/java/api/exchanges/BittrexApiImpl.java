@@ -42,7 +42,7 @@ public class BittrexApiImpl implements BittrexApi {
     public List<ApiInstrumentInfo> getInstrumentsInfo() {
         final List<ApiInstrumentInfo> ret = new ArrayList<>();
         try {
-            String apiResponse = ApiHelper.sendGet(BittrexApi.WITHDRAWAL_FEES_URL);
+            String apiResponse = ApiHelper.sendGet(BittrexApi.COIN_INFO_URL);
             JSONArray results = new JSONObject(apiResponse).getJSONArray("result");
             for (int i = 0; i < results.length(); i++) {
                 JSONObject instrumentInfo = (JSONObject) results.get(i);

@@ -1,13 +1,7 @@
 package core;
 
-import api.BinanceManager;
-import api.BinanceManagerImpl;
-import api.BittrexManager;
-import api.BittrexManagerImpl;
-import api.exchanges.BinanceApi;
-import api.exchanges.BinanceApiImpl;
-import api.exchanges.BittrexApi;
-import api.exchanges.BittrexApiImpl;
+import api.*;
+import api.exchanges.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -25,12 +19,16 @@ public class RuntimeModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(BittrexApi.class).to(BittrexApiImpl.class);
-        bind(BittrexManager.class).to(BittrexManagerImpl.class);
         bind(BinanceApi.class).to(BinanceApiImpl.class);
-        bind(BinanceManager.class).to(BinanceManagerImpl.class);
-        bind(ExchangeDataMap.class);
-        bind(TransactionRouter.class).to(TransactionRouterImpl.class);
+        bind(PoloniexApi.class).to(PoloniexApiImpl.class);
 
+        bind(BittrexManager.class).to(BittrexManagerImpl.class);
+        bind(BinanceManager.class).to(BinanceManagerImpl.class);
+        bind(PoloniexManager.class).to(PoloniexManagerImpl.class);
+
+        bind(ExchangeDataMap.class);
+        bind(CoinBlacklist.class).to(CoinBlacklistImpl.class);
+        bind(TransactionRouter.class).to(TransactionRouterImpl.class);
     }
 
 }

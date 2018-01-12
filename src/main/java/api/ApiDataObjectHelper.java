@@ -11,14 +11,14 @@ import java.util.*;
 
 public class ApiDataObjectHelper {
     public static CoinInfo unpackApiInstrumentInfo(final ApiInstrumentInfo apiInstrumentInfo, final Exchange exchange) {
-        return new CoinInfo(apiInstrumentInfo.getSymbol(), apiInstrumentInfo.getWithdrawalFee(), apiInstrumentInfo.isActive(), exchange);
+        return new CoinInfo(apiInstrumentInfo.getCoin(), apiInstrumentInfo.getWithdrawalFee(), apiInstrumentInfo.isActive(), exchange);
     }
 
     public static Map<String, CoinInfo> toInstrumentInfoMap(final List<ApiInstrumentInfo> instrumentInfoList, final Exchange exchange) {
         Map<String, CoinInfo> ret = new HashMap<>();
         for (ApiInstrumentInfo apiInfo : instrumentInfoList) {
             CoinInfo unpackedInfo = ApiDataObjectHelper.unpackApiInstrumentInfo(apiInfo, exchange);
-            ret.put(apiInfo.getSymbol(), unpackedInfo);
+            ret.put(apiInfo.getCoin(), unpackedInfo);
 
         }
         return Collections.unmodifiableMap(ret);

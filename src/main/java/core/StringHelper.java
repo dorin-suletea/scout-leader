@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
  */
 public class StringHelper {
     public static String formattedDouble(final Double input){
-        DecimalFormat decimalFormat = new DecimalFormat("#.####################");
+        DecimalFormat decimalFormat = new DecimalFormat("#.#######");
         return decimalFormat.format(input);
     }
 }

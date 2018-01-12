@@ -1,5 +1,6 @@
 package core.transaction;
 
+import api.CoinBlacklist;
 import core.model.CoinInfo;
 import core.model.Exchange;
 import core.model.Instrument;
@@ -15,10 +16,12 @@ import java.util.List;
  */
 public class TransactionRouterImpl implements TransactionRouter {
     private final ExchangeDataMap exchangeData;
+    private final CoinBlacklist coinBlacklist;
 
     @Inject
-    public TransactionRouterImpl(final ExchangeDataMap exchangeData) {
+    public TransactionRouterImpl(final ExchangeDataMap exchangeData, final CoinBlacklist coinBlacklist) {
         this.exchangeData = exchangeData;
+        this.coinBlacklist = coinBlacklist;
     }
 
     @Override
@@ -55,25 +58,28 @@ public class TransactionRouterImpl implements TransactionRouter {
         //if both need to convert and transfer send; create 2 chains convert->send and send->convert
         if (!tradeStartCoinIsBaseCoin && !tradeStartExchangeIsBaseExchange) {
             TransactionChain convertAndSendChain = new TransactionChain();
-            Transaction exchangeTransaction1 = exchangeCoins(baseExchange, baseCoin, trade.getFrom().getLeftSymbol());
-            Transaction transferTransaction1 = transferCoins(trade.getFrom().getLeftSymbol(), baseExchange, trade.getFrom().getExchange());
-            if (exchangeTransaction1 != null) {
-                convertAndSendChain.addToChain(exchangeTransaction1);
-                convertAndSendChain.addToChain(transferTransaction1);
-                convertAndSendChain.addToChain(transactionsForTradeExecution);
+            convertAndSendChain.addToChain(
+                    exchangeCoins(baseExchange, baseCoin, trade.getFrom().getLeftSymbol()),
+                    transferCoins(trade.getFrom().getLeftSymbol(), baseExchange, trade.getFrom().getExchange())
+            );
+            convertAndSendChain.addToChain(transactionsForTradeExecution);
+            if (convertAndSendChain.isValidChain()) {
                 ret.add(convertAndSendChain);
             }
+
+
             TransactionChain sendAndConvert = new TransactionChain();
-            Transaction transferTransaction2 = transferCoins(baseCoin, baseExchange, trade.getFrom().getExchange());
-            Transaction exchangeTransaction2 = exchangeCoins(trade.getFrom().getExchange(), baseCoin, trade.getFrom().getLeftSymbol());
-            if (exchangeTransaction2 != null) {
-                sendAndConvert.addToChain(transferTransaction2);
-                sendAndConvert.addToChain(exchangeTransaction2);
-                sendAndConvert.addToChain(transactionsForTradeExecution);
+            sendAndConvert.addToChain(
+                    transferCoins(baseCoin, baseExchange, trade.getFrom().getExchange()),
+                    exchangeCoins(trade.getFrom().getExchange(), baseCoin, trade.getFrom().getLeftSymbol()
+            ));
+            sendAndConvert.addToChain(transactionsForTradeExecution);
+            if (sendAndConvert.isValidChain()){
                 ret.add(sendAndConvert);
             }
             return ret;
         }
+
         if (!tradeStartCoinIsBaseCoin) {
             Transaction exchangeTransaction = exchangeCoins(trade.getFrom().getExchange(), baseCoin, trade.getFrom().getLeftSymbol());
             if (exchangeTransaction != null) {
@@ -124,6 +130,10 @@ public class TransactionRouterImpl implements TransactionRouter {
     }
 
     private TransferTransaction transferCoins(final String coin, final Exchange fromExchange, final Exchange toExchange) {
+        if (coinBlacklist.isCoinBlackListed(fromExchange, coin) || coinBlacklist.isCoinBlackListed(toExchange, coin)) {
+            //coin is blacklisted, info incomplete = > invalidate chain
+            return null;
+        }
         final CoinInfo withdrawCoinInfo = exchangeData.getCoinInfo(coin, fromExchange);
         return new TransferTransaction(coin, withdrawCoinInfo.getWithdrawalFee(), fromExchange, toExchange);
     }

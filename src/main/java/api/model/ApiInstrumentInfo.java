@@ -1,18 +1,18 @@
 package api.model;
 
 public class ApiInstrumentInfo {
-    private final String symbol;
+    private final String coin;
     private final double withdrawalFee;
     private final boolean isActive;
 
-    public ApiInstrumentInfo(final String symbol, final double withdrawalFee, final boolean isActive) {
-        this.symbol = symbol;
+    public ApiInstrumentInfo(final String coin, final double withdrawalFee, final boolean isActive) {
+        this.coin = coin;
         this.withdrawalFee = withdrawalFee;
         this.isActive = isActive;
     }
 
-    public String getSymbol() {
-        return symbol;
+    public String getCoin() {
+        return coin;
     }
 
     public double getWithdrawalFee() {

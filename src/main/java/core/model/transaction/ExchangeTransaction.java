@@ -1,6 +1,7 @@
 package core.model.transaction;
 
 import core.Constants;
+import core.StringHelper;
 import core.model.Instrument;
 
 public class ExchangeTransaction implements Transaction {
@@ -25,7 +26,9 @@ public class ExchangeTransaction implements Transaction {
 
     @Override
     public String toString() {
-        return "Exchange : " + instrument.getLeftSymbol() + " --- " + instrument.getRightSymbol() + " " + instrument.getExchange() + " [Price " + instrument.getPrice()+"]";
+        return "Exchange : " + instrument.getLeftSymbol() + " --- " + instrument.getRightSymbol() + " " + instrument.getExchange()
+                + " [Price " + StringHelper.formattedDouble(instrument.getPrice()) + "]"
+                + " [RevPrice " + StringHelper.formattedDouble(1 / instrument.getPrice()) + "]";
     }
 
 }

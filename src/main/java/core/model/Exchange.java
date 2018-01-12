@@ -1,8 +1,9 @@
 package core.model;
 
 public enum Exchange {
-    BINANCE( 0.1d),
-    BITTREX( 0.25d);
+    BINANCE(0.1d),
+    BITTREX(0.25d),
+    POLONIEX(0.25d);
 
     private final double exchangeFee;
 

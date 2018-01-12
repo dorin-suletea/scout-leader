@@ -1,6 +1,7 @@
 package core.model.transaction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,6 +22,10 @@ public class TransactionChain implements Transaction {
 
     public void addToChain(final List<Transaction> transactionToAdd) {
         transactions.addAll(transactionToAdd);
+    }
+
+    public void addToChain(final Transaction ... transactionsToAdd) {
+        transactions.addAll(Arrays.asList(transactionsToAdd));
     }
 
     @Override
@@ -54,9 +59,18 @@ public class TransactionChain implements Transaction {
         for (Transaction transaction : transactions) {
             transactionResult = transaction.getTransactionOutput(inputForNextTrade);
             inputForNextTrade = transactionResult.getCoinCount();
-            ret.append(transaction.toString()+" "+transactionResult+" "+"\n");
+            ret.append(transaction.toString() + " " + transactionResult + " " + "\n");
         }
         return ret.toString();
+    }
+
+    public boolean isValidChain() {
+        for (Transaction transaction : transactions) {
+            if (transaction == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public List<Transaction> getTransactions() {

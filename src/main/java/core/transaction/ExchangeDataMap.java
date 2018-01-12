@@ -3,6 +3,7 @@ package core.transaction;
 import api.BinanceManager;
 import api.BittrexManager;
 import api.ExchangeManager;
+import api.PoloniexManager;
 import core.model.CoinInfo;
 import core.model.Exchange;
 import core.model.Instrument;
@@ -18,10 +19,10 @@ public class ExchangeDataMap {
     private final Map<Exchange, Pair<List<Instrument>, Map<String, CoinInfo>>> exchangeDataMap;
 
     @Inject
-    public ExchangeDataMap(final BittrexManager bittrexManager, final BinanceManager binanceManager) {
+    public ExchangeDataMap(final BittrexManager bittrexManager, final BinanceManager binanceManager, final PoloniexManager poloniexManager) {
         this.exchangeDataMap = new HashMap<>();
+        final List<ExchangeManager> exchangeManagers = Arrays.asList(bittrexManager, binanceManager, poloniexManager);
 
-        final List<ExchangeManager> exchangeManagers = Arrays.asList(bittrexManager, binanceManager);
         for (ExchangeManager exchangeManager : exchangeManagers) {
             List<Instrument> instruments = exchangeManager.getInstruments();
             Map<String, CoinInfo> instrumentInfoMap = exchangeManager.getCoinInfo();
