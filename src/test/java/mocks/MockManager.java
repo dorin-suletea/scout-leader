@@ -1,6 +1,6 @@
 package mocks;
 
-import api.ExchangeManager;
+import api.exchanges.ExchangeManager;
 import core.model.CoinInfo;
 import core.model.Instrument;
 

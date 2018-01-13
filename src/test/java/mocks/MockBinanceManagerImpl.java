@@ -1,6 +1,6 @@
 package mocks;
 
-import api.BinanceManager;
+import api.exchanges.BinanceManager;
 import core.model.Exchange;
 import core.model.Instrument;
 

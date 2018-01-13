@@ -1,9 +1,9 @@
 package core.transaction;
 
-import api.BinanceManager;
-import api.BittrexManager;
-import api.ExchangeManager;
-import api.PoloniexManager;
+import api.exchanges.BinanceManager;
+import api.exchanges.BittrexManager;
+import api.exchanges.ExchangeManager;
+import api.exchanges.PoloniexManager;
 import core.model.CoinInfo;
 import core.model.Exchange;
 import core.model.Instrument;

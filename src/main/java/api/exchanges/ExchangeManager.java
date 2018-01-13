@@ -1,4 +1,4 @@
-package api;
+package api.exchanges;
 
 import core.model.Exchange;
 import core.model.Instrument;

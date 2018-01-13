@@ -1,7 +1,8 @@
-package api;
+package api.exchanges;
 
-import api.exchanges.ExchangeApi;
-import api.model.ApiInstrument;
+import api.ApiDataObjectHelper;
+import api.exchanges.api.ExchangeApi;
+import api.ApiInstrument;
 import core.MathHelper;
 import core.model.Instrument;
 

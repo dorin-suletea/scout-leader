@@ -1,4 +1,4 @@
-package api.exchanges;
+package api.exchanges.api;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;

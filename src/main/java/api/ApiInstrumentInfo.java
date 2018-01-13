@@ -1,4 +1,4 @@
-package api.model;
+package api;
 
 public class ApiInstrumentInfo {
     private final String coin;

@@ -1,4 +1,4 @@
-package api.exchanges;
+package api.exchanges.api;
 
 public interface BinanceApi extends ExchangeApi {
     String BINANCE_URL = "https://www.binance.com/api/";

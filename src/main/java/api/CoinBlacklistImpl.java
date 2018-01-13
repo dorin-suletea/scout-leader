@@ -1,6 +1,5 @@
 package api;
 
-import api.model.ApiInstrument;
 import core.model.Exchange;
 
 import javax.inject.Singleton;

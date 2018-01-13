@@ -1,4 +1,4 @@
-package api.exchanges;
+package api.exchanges.api;
 
 public interface PoloniexApi extends ExchangeApi {
     String POLONIEX_URL = "https://poloniex.com/public?command=";

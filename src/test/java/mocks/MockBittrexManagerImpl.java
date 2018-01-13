@@ -1,6 +1,6 @@
 package mocks;
 
-import api.BittrexManager;
+import api.exchanges.BittrexManager;
 import core.model.Exchange;
 import core.model.Instrument;
 

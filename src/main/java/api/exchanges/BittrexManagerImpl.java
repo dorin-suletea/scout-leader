@@ -1,7 +1,8 @@
-package api;
+package api.exchanges;
 
-import api.exchanges.PoloniexApi;
-import api.model.ApiInstrumentInfo;
+import api.ApiDataObjectHelper;
+import api.exchanges.api.BittrexApi;
+import api.ApiInstrumentInfo;
 import core.model.CoinInfo;
 import core.model.Exchange;
 
@@ -9,11 +10,11 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
-public class PoloniexManagerImpl extends ExchangeManagerBase implements PoloniexManager {
+public class BittrexManagerImpl extends ExchangeManagerBase implements BittrexManager {
 
     @Inject
-    public PoloniexManagerImpl(final PoloniexApi poloniexApi) {
-        super(poloniexApi);
+    public BittrexManagerImpl(final BittrexApi bittrexApi) {
+        super(bittrexApi);
     }
 
     @Override
@@ -24,7 +25,6 @@ public class PoloniexManagerImpl extends ExchangeManagerBase implements Poloniex
 
     @Override
     public Exchange getExchange() {
-        return Exchange.POLONIEX;
+        return Exchange.BITTREX;
     }
-
 }

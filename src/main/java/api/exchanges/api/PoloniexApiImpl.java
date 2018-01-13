@@ -1,7 +1,7 @@
-package api.exchanges;
+package api.exchanges.api;
 
-import api.model.ApiInstrument;
-import api.model.ApiInstrumentInfo;
+import api.ApiInstrument;
+import api.ApiInstrumentInfo;
 import org.json.JSONException;
 import org.json.JSONObject;
 

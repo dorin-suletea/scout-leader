@@ -2,6 +2,7 @@ package core;
 
 import api.*;
 import api.exchanges.*;
+import api.exchanges.api.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
