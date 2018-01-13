@@ -13,5 +13,7 @@ public interface Transaction {
 
     String getResultCoin();
 
+    String getInputCoin();
+
     Exchange getResultExchange();
 }

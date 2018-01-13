@@ -3,9 +3,11 @@ import api.BittrexManager;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import core.RuntimeModule;
 import core.model.Exchange;
 import core.model.Instrument;
 import core.model.InstrumentDirection;
+import core.model.transaction.Transaction;
 import core.model.transaction.TransactionChain;
 import core.model.transaction.TransactionChainAndChainResult;
 import core.model.transaction.TransferTransaction;
@@ -70,6 +72,22 @@ public class TransactionRouterTest {
         for (TransactionChainAndChainResult chain : chainAndChainResult) {
             assertChainDoesNotStartWithTransfer(chain.getChain());
         }
+    }
+
+
+    @Test
+    public void testGeneratedTradesLink(){
+        TransactionRouter router = RuntimeModule.getInjectedObject((TransactionRouter.class));
+        List<TransactionChainAndChainResult> chainAndChainResult = router.getTradeChains(baseExchange, inputCoin, deposit);
+
+        String tempInputCoin = inputCoin;
+        for (TransactionChainAndChainResult chainResult : chainAndChainResult){
+            for (Transaction transaction : chainResult.getChain().getTransactions()) {
+                Assert.assertEquals(tempInputCoin, transaction.getInputCoin());
+                tempInputCoin = transaction.getResultCoin();
+            }
+        }
+        Assert.assertEquals(tempInputCoin, inputCoin);
     }
 
 

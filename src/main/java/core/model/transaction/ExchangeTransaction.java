@@ -31,6 +31,11 @@ public class ExchangeTransaction implements Transaction {
     }
 
     @Override
+    public String getInputCoin() {
+        return instrument.getLeftSymbol();
+    }
+
+    @Override
     public Exchange getResultExchange() {
         return instrument.getExchange();
     }
