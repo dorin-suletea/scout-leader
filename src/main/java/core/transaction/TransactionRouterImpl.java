@@ -135,24 +135,24 @@ public class TransactionRouterImpl implements TransactionRouter {
         boolean isSameExchangeTrade = trade.getFrom().getExchange() == trade.getTo().getExchange();
 
         Transaction legOneOfTrade = TransactionHelper.exchangeCoins(exchangeData, trade.getFrom());
-        Transaction legTwoOfTrade = TransactionHelper.exchangeCoins(exchangeData, trade.getTo());
         Transaction toBaseCoinTransaction = TransactionHelper.exchangeCoins(exchangeData, trade.getTo().getExchange(), trade.getTo().getRightSymbol(), baseCoin);
 
         //no need to transfer
         if (isSameExchangeTrade) {
+
             chains.add(new TransactionChain(Arrays.asList(
                     legOneOfTrade,
-                    legTwoOfTrade,
+                    TransactionHelper.exchangeCoins(exchangeData, trade.getTo()),
                     toBaseCoinTransaction
             )));
         } else {
-            List<TransactionChain> possibleTransferTransactions = transferStrategy.transferCoinAlternatives(trade.getFrom().getRightSymbol(), trade.getFrom().getExchange(), trade.getTo().getExchange());
+            List<TransactionChain> possibleTransferTransactions = transferStrategy.transferCoinAlternatives(legOneOfTrade.getResultCoin(), trade.getFrom().getExchange(), trade.getTo().getExchange());
             for (TransactionChain transferOption : possibleTransferTransactions) {
                 if (transferOption.isValidChain()) {
                     chains.add(new TransactionChain(Arrays.asList(
                             legOneOfTrade,
                             transferOption,
-                            legTwoOfTrade,
+                            TransactionHelper.exchangeCoins(exchangeData, trade.getTo().getExchange(), transferOption.getResultCoin(), trade.getTo().getRightSymbol()),
                             toBaseCoinTransaction
                     )));
                 }

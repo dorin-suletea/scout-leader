@@ -56,10 +56,22 @@ public class TransferStrategyFactoryImpl implements TransferStrategyFactory {
                 }
 
                 //normal case (baseCoin is not a fastCoin)
-                ExchangeTransaction exchangeTransaction = TransactionHelper.exchangeCoins(exchangeData, fromExchange, coin, fastCoin);
-                CoinInfo withdrawCoinInfo = exchangeData.getCoinInfo(fastCoin, fromExchange);
-                TransferTransaction transferTransaction = new TransferTransaction(coin, withdrawCoinInfo.getWithdrawalFee(), fromExchange, toExchange);
-                TransactionChain newChain = new TransactionChain(exchangeTransaction, transferTransaction);
+                ExchangeTransaction exchangeIntoFastCoin = TransactionHelper.exchangeCoins(exchangeData, fromExchange, coin, fastCoin);
+                //todo,validate this in a better way
+                if (exchangeIntoFastCoin==null){
+                    continue;
+                }
+                TransferTransaction transferTransaction = new TransferTransaction(exchangeIntoFastCoin.getResultCoin(), exchangeData.getCoinInfo(fastCoin, fromExchange).getWithdrawalFee(), fromExchange, toExchange);
+                ExchangeTransaction exchangeFromFastCoin = TransactionHelper.exchangeCoins(exchangeData, fromExchange, transferTransaction.getResultCoin(), coin);
+                //todo,validate this in a better way
+                if (exchangeFromFastCoin==null){
+                    continue;
+                }
+
+
+
+
+                TransactionChain newChain = new TransactionChain(exchangeIntoFastCoin, transferTransaction,exchangeFromFastCoin);
                 if (newChain.isValidChain()) {
                     ret.add(newChain);
                 }

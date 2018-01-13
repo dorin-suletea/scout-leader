@@ -14,12 +14,12 @@ public class Main {
     public static void main(String args[]) {
 
         String baseCurrency = "ETH";
-        double deposit = 1;
+        double deposit = 0.3;
 
 
         TransactionRouter transactionRouter = RuntimeModule.getInjectedObject(TransactionRouter.class);
 
-        List<TransactionChainAndChainResult> chains = transactionRouter.getTradeChains(Exchange.BINANCE, baseCurrency, deposit, TransferStrategyType.FASTCOIN);
+        List<TransactionChainAndChainResult> chains = transactionRouter.getTradeChains(Exchange.BINANCE, baseCurrency, deposit, TransferStrategyType.SIMPLE);
 
         for (TransactionChainAndChainResult chainAndChainResult : chains){
             System.out.println(chainAndChainResult.toDebugString(deposit));

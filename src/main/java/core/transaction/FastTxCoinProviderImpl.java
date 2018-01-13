@@ -14,6 +14,9 @@ public class FastTxCoinProviderImpl implements FastTxCoinProvider{
 
     private void init(){
         fastTxCoins.add("XRP");
+        fastTxCoins.add("STEEM");
+        fastTxCoins.add("XRB");
+        fastTxCoins.add("LTC");
     }
 
     @Override

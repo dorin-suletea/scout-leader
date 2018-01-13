@@ -6,7 +6,10 @@ import com.google.inject.Injector;
 import core.RuntimeModule;
 import core.model.Exchange;
 import core.model.Instrument;
-import core.model.transaction.*;
+import core.model.transaction.Transaction;
+import core.model.transaction.TransactionChain;
+import core.model.transaction.TransactionChainAndChainResult;
+import core.model.transaction.TransferTransaction;
 import core.transaction.TransactionRouter;
 import core.transaction.TransactionRouterImpl;
 import core.transaction.strategy.TransferStrategyType;
@@ -74,43 +77,29 @@ public class TransactionRouterTest {
     public void testChainsLinkUsingSimpleTransferStrategy() {
         TransactionRouter router = RuntimeModule.getInjectedObject((TransactionRouter.class));
         List<TransactionChainAndChainResult> chainAndChainResult = router.getTradeChains(baseExchange, inputCoin, deposit, TransferStrategyType.SIMPLE);
-        assertChainTradesLink(chainAndChainResult);
+        assertTransactionsLink(chainAndChainResult);
     }
 
     @Test
     public void testChainsLinkUsingFastCoinTransferStrategy() {
         TransactionRouter router = RuntimeModule.getInjectedObject((TransactionRouter.class));
         List<TransactionChainAndChainResult> chainAndChainResult = router.getTradeChains(baseExchange, inputCoin, deposit, TransferStrategyType.FASTCOIN);
-        assertChainTradesLink(chainAndChainResult);
+        assertTransactionsLink(chainAndChainResult);
     }
 
 
-    //TODO use the chain.flatten to check transactions
 
-//    public void assertTransactionsLink(List<Transaction> generatedTransactions) {
-//        String tempInputCoin = inputCoin;
-//            for (Transaction transaction : generatedTransactions) {
-//                Assert.assertEquals(generatedTransactions.toString(),tempInputCoin, transaction.getInputCoin());
-//                tempInputCoin = transaction.getResultCoin();
-//            }
-//        Assert.assertEquals(tempInputCoin, inputCoin);
-//    }
-//
-//
-//
-//    public void assertChainTradesLink(List<TransactionChainAndChainResult> generatedChains) {
-//        String tempInputCoin = inputCoin;
-//        for (TransactionChainAndChainResult chainAndResult : generatedChains) {
-//            for (Transaction transaction : chainAndResult.getChain().getTransactions()) {
-//                if (transaction instanceof TransactionChain ){
-//                    assertTransactionsLink(((TransactionChain)transaction).getTransactions());
-//                }
-//                Assert.assertEquals(tempInputCoin, transaction.getInputCoin());
-//                tempInputCoin = transaction.getResultCoin();
-//            }
-//        }
-//        Assert.assertEquals(tempInputCoin, inputCoin);
-//    }
+    public void assertTransactionsLink(List<TransactionChainAndChainResult> chainResults) {
+        for (TransactionChainAndChainResult chain : chainResults) {
+            String tempInputCoin = inputCoin;
+            for (Transaction transaction : chain.getChain().flattren()) {
+                Assert.assertEquals(chain.getChain().toString(), tempInputCoin, transaction.getInputCoin());
+                tempInputCoin = transaction.getResultCoin();
+            }
+            Assert.assertEquals(tempInputCoin, inputCoin);
+        }
+
+    }
 
 
     private void assertChainDoesNotStartWithTransfer(final TransactionChain chain) {
