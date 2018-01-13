@@ -19,7 +19,7 @@ public class Main {
 
         TransactionRouter transactionRouter = RuntimeModule.getInjectedObject(TransactionRouter.class);
 
-        List<TransactionChainAndChainResult> chains = transactionRouter.getTradeChains(Exchange.BINANCE, baseCurrency, deposit, TransferStrategyType.SIMPLE);
+        List<TransactionChainAndChainResult> chains = transactionRouter.getTradeChains(Exchange.BINANCE, baseCurrency, deposit, TransferStrategyType.FASTCOIN);
 
         for (TransactionChainAndChainResult chainAndChainResult : chains){
             System.out.println(chainAndChainResult.toDebugString(deposit));

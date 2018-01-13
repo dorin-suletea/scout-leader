@@ -1,11 +1,15 @@
 package core.model.transaction;
 
+import core.model.Exchange;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class TransactionChain{
+public class TransactionChain implements Transaction{
+    public static TransactionChain VOID_CHAIN = new TransactionChain();
+
     private final List<Transaction> transactions;
 
     public TransactionChain() {
@@ -35,14 +39,6 @@ public class TransactionChain{
         }
     }
 
-    public void addToChain(final List<Transaction> transactionToAdd) {
-        transactions.addAll(transactionToAdd);
-    }
-
-    public void addToChain(final Transaction... transactionsToAdd) {
-        transactions.addAll(Arrays.asList(transactionsToAdd));
-    }
-
     public TransactionResult getTransactionOutput(final double baseCurrencyDeposit) {
         double inputForNextTrade = baseCurrencyDeposit;
 
@@ -63,6 +59,33 @@ public class TransactionChain{
         return ret.toString();
     }
 
+    @Override
+    public String getResultCoin() {
+        return transactions.get(transactions.size()-1).getResultCoin();
+    }
+
+    @Override
+    public String getInputCoin() {
+        return transactions.get(0).getInputCoin();
+    }
+
+    @Override
+    public Exchange getResultExchange() {
+        return transactions.get(transactions.size()-1).getResultExchange();
+    }
+
+    public List<Transaction> flattren(){
+        final List<Transaction> ret = new ArrayList<>();
+        for (Transaction transaction : transactions){
+            if (transaction instanceof TransactionChain){
+                ret.addAll(((TransactionChain)transaction).flattren());
+            }else{
+                ret.add(transaction);
+            }
+        }
+        return ret;
+    }
+
 
     public String toDebugString(final double inputCoinCount) {
         StringBuilder ret = new StringBuilder();
@@ -77,7 +100,20 @@ public class TransactionChain{
         return ret.toString();
     }
 
+    @Override
+    public String toString() {
+        StringBuilder ret = new StringBuilder();
+        for (Transaction chainTransactions : this.transactions){
+            ret.append(chainTransactions.toString());
+        }
+        return ret.toString();
+    }
+
     public boolean isValidChain() {
+        if (transactions.isEmpty()){
+            return false;
+        }
+
         for (Transaction transaction : transactions) {
             if (transaction == null) {
                 return false;

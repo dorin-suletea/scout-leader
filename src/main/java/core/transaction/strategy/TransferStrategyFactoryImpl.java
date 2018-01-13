@@ -2,31 +2,71 @@ package core.transaction.strategy;
 
 import api.CoinBlacklist;
 import core.model.CoinInfo;
+import core.model.transaction.ExchangeTransaction;
+import core.model.transaction.Transaction;
+import core.model.transaction.TransactionChain;
 import core.model.transaction.TransferTransaction;
 import core.transaction.ExchangeDataMap;
+import core.transaction.FastTxCoinProvider;
+import core.transaction.TransactionHelper;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @Singleton
 public class TransferStrategyFactoryImpl implements TransferStrategyFactory {
-//    private final FastTxCoinProvider
+    private final FastTxCoinProvider fastTxCoinProvider;
+
+    @Inject
+    public TransferStrategyFactoryImpl(final FastTxCoinProvider fastTxCoinProvider) {
+        this.fastTxCoinProvider = fastTxCoinProvider;
+    }
 
 
     private TransferStrategy makeSimpleTransferStrategy(final CoinBlacklist coinBlacklist, final ExchangeDataMap exchangeData) {
         return (coin, fromExchange, toExchange) -> {
             if (coinBlacklist.isCoinBlackListed(fromExchange, coin) || coinBlacklist.isCoinBlackListed(toExchange, coin)) {
                 //coin is blacklisted on one of the exchanges, info incomplete = > invalidate chain
-                return Collections.emptyList();
+                return Collections.singletonList(TransactionChain.VOID_CHAIN);
             }
             final CoinInfo withdrawCoinInfo = exchangeData.getCoinInfo(coin, fromExchange);
-            return Collections.singletonList(new TransferTransaction(coin, withdrawCoinInfo.getWithdrawalFee(), fromExchange, toExchange));
+            Transaction simpleTransferTransaction = new TransferTransaction(coin, withdrawCoinInfo.getWithdrawalFee(), fromExchange, toExchange);
+            return Collections.singletonList(new TransactionChain(simpleTransferTransaction));
         };
     }
 
 
     private TransferStrategy makeFastTransferStrategy(final CoinBlacklist coinBlacklist, final ExchangeDataMap exchangeData) {
-        return null;
+        return (coin, fromExchange, toExchange) -> {
+            List<TransactionChain> ret = new ArrayList<>();
+            for (String fastCoin : fastTxCoinProvider.getFastTransactionCoins()) {
+                if (coinBlacklist.isCoinBlackListed(fromExchange, fastCoin) || coinBlacklist.isCoinBlackListed(toExchange, fastCoin)) {
+                    continue;
+                }
+
+                if (fastCoin.equals(coin)) {
+                    //becomes simple strategy since the transfer is already fastCoin
+                    final CoinInfo withdrawCoinInfo = exchangeData.getCoinInfo(coin, fromExchange);
+                    Transaction simpleTransferTransaction = new TransferTransaction(coin, withdrawCoinInfo.getWithdrawalFee(), fromExchange, toExchange);
+                    ret.add(new TransactionChain(simpleTransferTransaction));
+                    continue;
+                }
+
+                //normal case (baseCoin is not a fastCoin)
+                ExchangeTransaction exchangeTransaction = TransactionHelper.exchangeCoins(exchangeData, fromExchange, coin, fastCoin);
+                CoinInfo withdrawCoinInfo = exchangeData.getCoinInfo(fastCoin, fromExchange);
+                TransferTransaction transferTransaction = new TransferTransaction(coin, withdrawCoinInfo.getWithdrawalFee(), fromExchange, toExchange);
+                TransactionChain newChain = new TransactionChain(exchangeTransaction, transferTransaction);
+                if (newChain.isValidChain()) {
+                    ret.add(newChain);
+                }
+            }
+
+            return ret;
+        };
     }
 
     @Override
@@ -34,6 +74,8 @@ public class TransferStrategyFactoryImpl implements TransferStrategyFactory {
         switch (desiredTransferType) {
             case SIMPLE:
                 return makeSimpleTransferStrategy(coinBlacklist, exchangeData);
+            case FASTCOIN:
+                return makeFastTransferStrategy(coinBlacklist, exchangeData);
 
         }
         throw new RuntimeException("Unknown transfer strategy type " + desiredTransferType);

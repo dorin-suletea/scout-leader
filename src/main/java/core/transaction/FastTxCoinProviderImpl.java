@@ -9,6 +9,11 @@ public class FastTxCoinProviderImpl implements FastTxCoinProvider{
 
     public FastTxCoinProviderImpl() {
         fastTxCoins = new ArrayList<>();
+        init();
+    }
+
+    private void init(){
+        fastTxCoins.add("XRP");
     }
 
     @Override

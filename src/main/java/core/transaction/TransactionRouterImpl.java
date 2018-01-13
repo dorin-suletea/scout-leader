@@ -3,7 +3,10 @@ package core.transaction;
 import api.CoinBlacklist;
 import core.model.Exchange;
 import core.model.Instrument;
-import core.model.transaction.*;
+import core.model.transaction.Transaction;
+import core.model.transaction.TransactionChain;
+import core.model.transaction.TransactionChainAndChainResult;
+import core.model.transaction.TransactionResult;
 import core.transaction.strategy.TransferStrategy;
 import core.transaction.strategy.TransferStrategyFactory;
 import core.transaction.strategy.TransferStrategyType;
@@ -67,7 +70,7 @@ public class TransactionRouterImpl implements TransactionRouter {
 
         if (!tradeStartCoinIsBaseCoin) {
             List<TransactionChain> convertAndExecute = new ArrayList<>();
-            Transaction exchangeTransaction = exchangeCoins(trade.getFrom().getExchange(), baseCoin, trade.getFrom().getLeftSymbol());
+            Transaction exchangeTransaction = TransactionHelper.exchangeCoins(exchangeData, trade.getFrom().getExchange(), baseCoin, trade.getFrom().getLeftSymbol());
             for (TransactionChain tradeChain : executeTradeSubChains) {
                 TransactionChain chainOption = new TransactionChain();
                 chainOption.addToChain(exchangeTransaction);
@@ -80,9 +83,9 @@ public class TransactionRouterImpl implements TransactionRouter {
 
         if (!tradeStartExchangeIsBaseExchange) {
             List<TransactionChain> transferAndExecute = new ArrayList<>();
-            List<Transaction> transferOptions = transferStrategy.transferCoinAlternatives(baseCoin, baseExchange, trade.getFrom().getExchange());
+            List<TransactionChain> transferOptions = transferStrategy.transferCoinAlternatives(baseCoin, baseExchange, trade.getFrom().getExchange());
 
-            for (Transaction setup : transferOptions) {
+            for (TransactionChain setup : transferOptions) {
                 for (TransactionChain tradeChain : executeTradeSubChains) {
                     TransactionChain transferAndExecuteChainOption = new TransactionChain();
                     transferAndExecuteChainOption.addToChain(setup);
@@ -104,17 +107,17 @@ public class TransactionRouterImpl implements TransactionRouter {
         List<TransactionChain> convertAndSendChains = new ArrayList<>();
 
         //convert and send
-        List<Transaction> transferOptions1 = transferStrategy.transferCoinAlternatives(trade.getFrom().getLeftSymbol(), baseExchange, trade.getFrom().getExchange());
-        Transaction exchangeTransaction1 = exchangeCoins(baseExchange, baseCoin, trade.getFrom().getLeftSymbol());
-        for (Transaction transferOption : transferOptions1) {
+        List<TransactionChain> transferOptions1 = transferStrategy.transferCoinAlternatives(trade.getFrom().getLeftSymbol(), baseExchange, trade.getFrom().getExchange());
+        Transaction exchangeTransaction1 = TransactionHelper.exchangeCoins(exchangeData, baseExchange, baseCoin, trade.getFrom().getLeftSymbol());
+        for (TransactionChain transferOption : transferOptions1) {
             convertAndSendChains.add(new TransactionChain(exchangeTransaction1, transferOption));
         }
 
         //send and convert
         List<TransactionChain> sendAndConvertChains = new ArrayList<>();
-        List<Transaction> transferOptions2 = transferStrategy.transferCoinAlternatives(baseCoin, baseExchange, trade.getFrom().getExchange());
-        for (Transaction transferOption : transferOptions2) {
-            Transaction exchangeTransaction2 = exchangeCoins(transferOption.getResultExchange(), transferOption.getResultCoin(), trade.getFrom().getLeftSymbol());
+        List<TransactionChain> transferOptions2 = transferStrategy.transferCoinAlternatives(baseCoin, baseExchange, trade.getFrom().getExchange());
+        for (TransactionChain transferOption : transferOptions2) {
+            Transaction exchangeTransaction2 = TransactionHelper.exchangeCoins(exchangeData, transferOption.getResultExchange(), transferOption.getResultCoin(), trade.getFrom().getLeftSymbol());
             sendAndConvertChains.add(new TransactionChain(transferOption, exchangeTransaction2));
         }
 
@@ -131,9 +134,9 @@ public class TransactionRouterImpl implements TransactionRouter {
 
         boolean isSameExchangeTrade = trade.getFrom().getExchange() == trade.getTo().getExchange();
 
-        Transaction legOneOfTrade = exchangeCoins(trade.getFrom());
-        Transaction legTwoOfTrade = exchangeCoins(trade.getTo());
-        Transaction toBaseCoinTransaction = exchangeCoins(trade.getTo().getExchange(), trade.getTo().getRightSymbol(), baseCoin);
+        Transaction legOneOfTrade = TransactionHelper.exchangeCoins(exchangeData, trade.getFrom());
+        Transaction legTwoOfTrade = TransactionHelper.exchangeCoins(exchangeData, trade.getTo());
+        Transaction toBaseCoinTransaction = TransactionHelper.exchangeCoins(exchangeData, trade.getTo().getExchange(), trade.getTo().getRightSymbol(), baseCoin);
 
         //no need to transfer
         if (isSameExchangeTrade) {
@@ -143,36 +146,20 @@ public class TransactionRouterImpl implements TransactionRouter {
                     toBaseCoinTransaction
             )));
         } else {
-            List<Transaction> possibleTransferTransactions = transferStrategy.transferCoinAlternatives(trade.getFrom().getRightSymbol(), trade.getFrom().getExchange(), trade.getTo().getExchange());
-            for (Transaction transferOption : possibleTransferTransactions) {
-                chains.add(new TransactionChain(Arrays.asList(
-                        legOneOfTrade,
-                        transferOption,
-                        legTwoOfTrade,
-                        toBaseCoinTransaction
-                )));
+            List<TransactionChain> possibleTransferTransactions = transferStrategy.transferCoinAlternatives(trade.getFrom().getRightSymbol(), trade.getFrom().getExchange(), trade.getTo().getExchange());
+            for (TransactionChain transferOption : possibleTransferTransactions) {
+                if (transferOption.isValidChain()) {
+                    chains.add(new TransactionChain(Arrays.asList(
+                            legOneOfTrade,
+                            transferOption,
+                            legTwoOfTrade,
+                            toBaseCoinTransaction
+                    )));
+                }
             }
         }
 
         return filterOutInvalidChains(chains);
-    }
-
-    private ExchangeTransaction exchangeCoins(final Exchange exchange, final String iHaveCoin, final String iWantCoin) {
-        for (Instrument pair : exchangeData.getInstruments(exchange)) {
-            if (pair.getLeftSymbol().equals(iHaveCoin) && pair.getRightSymbol().equals(iWantCoin)) {
-                return new ExchangeTransaction(pair);
-            }
-        }
-        return null;
-    }
-
-    private ExchangeTransaction exchangeCoins(final Instrument instrument) {
-        for (Instrument pair : exchangeData.getInstruments(instrument.getExchange())) {
-            if (pair.getLeftSymbol().equals(instrument.getLeftSymbol()) && pair.getRightSymbol().equals(instrument.getRightSymbol())) {
-                return new ExchangeTransaction(pair);
-            }
-        }
-        return null;
     }
 
 
