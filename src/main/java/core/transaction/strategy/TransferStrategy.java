@@ -5,6 +5,6 @@ import core.model.transaction.Transaction;
 
 import java.util.List;
 
-public interface TransferTransactionStrategy {
+public interface TransferStrategy {
     List<Transaction> transferCoinAlternatives(final String coin, final Exchange fromExchange, final Exchange toExchange);
 }

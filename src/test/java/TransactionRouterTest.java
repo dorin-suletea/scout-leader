@@ -13,6 +13,7 @@ import core.model.transaction.TransactionChainAndChainResult;
 import core.model.transaction.TransferTransaction;
 import core.transaction.TransactionRouter;
 import core.transaction.TransactionRouterImpl;
+import core.transaction.strategy.TransferStrategyType;
 import mocks.MockBinanceManagerImpl;
 import mocks.MockBittrexManagerImpl;
 import org.junit.Assert;
@@ -66,7 +67,7 @@ public class TransactionRouterTest {
         withNewInjector();
 
         TransactionRouter router = injector.getInstance(TransactionRouter.class);
-        List<TransactionChainAndChainResult> chainAndChainResult = router.getTradeChains(baseExchange, inputCoin, deposit);
+        List<TransactionChainAndChainResult> chainAndChainResult = router.getTradeChains(baseExchange, inputCoin, deposit, TransferStrategyType.SIMPLE);
 
 
         for (TransactionChainAndChainResult chain : chainAndChainResult) {
@@ -74,14 +75,17 @@ public class TransactionRouterTest {
         }
     }
 
-
     @Test
-    public void testGeneratedTradesLink(){
+    public void testChainsLinkUsingSimpleTransferStrategy() {
         TransactionRouter router = RuntimeModule.getInjectedObject((TransactionRouter.class));
-        List<TransactionChainAndChainResult> chainAndChainResult = router.getTradeChains(baseExchange, inputCoin, deposit);
+        List<TransactionChainAndChainResult> chainAndChainResult = router.getTradeChains(baseExchange, inputCoin, deposit, TransferStrategyType.SIMPLE);
+        assertChainTradesLink(chainAndChainResult);
+    }
 
+
+    public void assertChainTradesLink(List<TransactionChainAndChainResult> generatedChains) {
         String tempInputCoin = inputCoin;
-        for (TransactionChainAndChainResult chainResult : chainAndChainResult){
+        for (TransactionChainAndChainResult chainResult : generatedChains) {
             for (Transaction transaction : chainResult.getChain().getTransactions()) {
                 Assert.assertEquals(tempInputCoin, transaction.getInputCoin());
                 tempInputCoin = transaction.getResultCoin();

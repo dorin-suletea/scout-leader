@@ -3,7 +3,7 @@ package core;
 import core.model.Exchange;
 import core.model.transaction.TransactionChainAndChainResult;
 import core.transaction.TransactionRouter;
-import core.transaction.strategy.TransferTransactionFactory;
+import core.transaction.strategy.TransferStrategyType;
 
 import java.util.List;
 
@@ -18,9 +18,8 @@ public class Main {
 
 
         TransactionRouter transactionRouter = RuntimeModule.getInjectedObject(TransactionRouter.class);
-        TransferTransactionFactory transferTransactionFactory = RuntimeModule.getInjectedObject(TransferTransactionFactory.class);
 
-        List<TransactionChainAndChainResult> chains = transactionRouter.getTradeChains(Exchange.BINANCE, baseCurrency, deposit);
+        List<TransactionChainAndChainResult> chains = transactionRouter.getTradeChains(Exchange.BINANCE, baseCurrency, deposit, TransferStrategyType.SIMPLE);
 
         for (TransactionChainAndChainResult chainAndChainResult : chains){
             System.out.println(chainAndChainResult.toDebugString(deposit));

@@ -9,10 +9,11 @@ import javax.inject.Singleton;
 import java.util.Collections;
 
 @Singleton
-public class TransferTransactionFactoryImpl implements TransferTransactionFactory {
+public class TransferStrategyFactoryImpl implements TransferStrategyFactory {
+//    private final FastTxCoinProvider
 
-    @Override
-    public TransferTransactionStrategy makeSimpleTransferStrategy(final CoinBlacklist coinBlacklist, final ExchangeDataMap exchangeData) {
+
+    private TransferStrategy makeSimpleTransferStrategy(final CoinBlacklist coinBlacklist, final ExchangeDataMap exchangeData) {
         return (coin, fromExchange, toExchange) -> {
             if (coinBlacklist.isCoinBlackListed(fromExchange, coin) || coinBlacklist.isCoinBlackListed(toExchange, coin)) {
                 //coin is blacklisted on one of the exchanges, info incomplete = > invalidate chain
@@ -23,8 +24,18 @@ public class TransferTransactionFactoryImpl implements TransferTransactionFactor
         };
     }
 
-    @Override
-    public TransferTransactionStrategy makeFastTransferStrategy(final CoinBlacklist coinBlacklist, final ExchangeDataMap exchangeData) {
+
+    private TransferStrategy makeFastTransferStrategy(final CoinBlacklist coinBlacklist, final ExchangeDataMap exchangeData) {
         return null;
+    }
+
+    @Override
+    public TransferStrategy makeTransferStrategy(final TransferStrategyType desiredTransferType, final CoinBlacklist coinBlacklist, final ExchangeDataMap exchangeData) {
+        switch (desiredTransferType) {
+            case SIMPLE:
+                return makeSimpleTransferStrategy(coinBlacklist, exchangeData);
+
+        }
+        throw new RuntimeException("Unknown transfer strategy type " + desiredTransferType);
     }
 }

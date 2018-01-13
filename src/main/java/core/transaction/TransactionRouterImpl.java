@@ -1,11 +1,12 @@
 package core.transaction;
 
 import api.CoinBlacklist;
-import core.model.CoinInfo;
 import core.model.Exchange;
 import core.model.Instrument;
 import core.model.transaction.*;
-import core.transaction.strategy.TransferTransactionStrategy;
+import core.transaction.strategy.TransferStrategy;
+import core.transaction.strategy.TransferStrategyFactory;
+import core.transaction.strategy.TransferStrategyType;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -19,31 +20,23 @@ import java.util.List;
 public class TransactionRouterImpl implements TransactionRouter {
     private final ExchangeDataMap exchangeData;
     private final CoinBlacklist coinBlacklist;
+    private final TransferStrategyFactory transferStrategyFactory;
 
     @Inject
-    public TransactionRouterImpl(final ExchangeDataMap exchangeData, final CoinBlacklist coinBlacklist) {
+    public TransactionRouterImpl(final ExchangeDataMap exchangeData, final CoinBlacklist coinBlacklist, final TransferStrategyFactory transferStrategyFactory) {
         this.exchangeData = exchangeData;
         this.coinBlacklist = coinBlacklist;
+        this.transferStrategyFactory = transferStrategyFactory;
     }
 
     @Override
-    public List<TransactionChainAndChainResult> getTradeChains(final Exchange baseExchange, final String baseCoin, final double baseCurrencyDeposit) {
+    public List<TransactionChainAndChainResult> getTradeChains(final Exchange baseExchange, final String baseCoin, final double baseCurrencyDeposit, final TransferStrategyType transferStrategyType) {
         List<Trade> compatibleInstrumentPairs = getCompatibleInstrumentsBetweenAllExchanges();
         List<TransactionChain> allChains = new ArrayList<>();
 
-        //TODO use factory or param
-        TransferTransactionStrategy strategy = (coin, fromExchange, toExchange) -> {
-            if (coinBlacklist.isCoinBlackListed(fromExchange, coin) || coinBlacklist.isCoinBlackListed(toExchange, coin)) {
-                //coin is blacklisted on one of the exchanges, info incomplete = > invalidate chain
-                return Collections.EMPTY_LIST;
-            }
-            final CoinInfo withdrawCoinInfo = exchangeData.getCoinInfo(coin, fromExchange);
-            return Collections.singletonList(new TransferTransaction(coin, withdrawCoinInfo.getWithdrawalFee(), fromExchange, toExchange));
-        };
-
-
+        TransferStrategy transferStrategy = transferStrategyFactory.makeTransferStrategy(transferStrategyType, coinBlacklist, exchangeData);
         for (Trade trade : compatibleInstrumentPairs) {
-            List<TransactionChain> chainsForTrade = generateChainsForTrade(baseExchange, baseCoin, trade, strategy);
+            List<TransactionChain> chainsForTrade = generateChainsForTrade(baseExchange, baseCoin, trade, transferStrategy);
             allChains.addAll(chainsForTrade);
         }
 
@@ -54,7 +47,7 @@ public class TransactionRouterImpl implements TransactionRouter {
     }
 
 
-    private List<TransactionChain> generateChainsForTrade(final Exchange baseExchange, final String baseCoin, final Trade trade, final TransferTransactionStrategy transferStrategy) {
+    private List<TransactionChain> generateChainsForTrade(final Exchange baseExchange, final String baseCoin, final Trade trade, final TransferStrategy transferStrategy) {
         final boolean tradeStartCoinIsBaseCoin = trade.getFrom().getLeftSymbol().equals(baseCoin);
         final boolean tradeStartExchangeIsBaseExchange = trade.getFrom().getExchange().equals(baseExchange);
         List<TransactionChain> executeTradeSubChains = tradeAsSubChainOptions(trade, baseCoin, transferStrategy);
@@ -107,11 +100,11 @@ public class TransactionRouterImpl implements TransactionRouter {
     /**
      * if both need to convert and transfer send; create 2 chains convert->send and send->convert
      **/
-    private List<TransactionChain> tradeSetupOptionsForNonBaseExchangeAndNonBaseCurrency(final Exchange baseExchange, final String baseCoin, final Trade trade, final TransferTransactionStrategy transferTransactionStrategy) {
+    private List<TransactionChain> tradeSetupOptionsForNonBaseExchangeAndNonBaseCurrency(final Exchange baseExchange, final String baseCoin, final Trade trade, final TransferStrategy transferStrategy) {
         List<TransactionChain> convertAndSendChains = new ArrayList<>();
 
         //convert and send
-        List<Transaction> transferOptions1 = transferTransactionStrategy.transferCoinAlternatives(trade.getFrom().getLeftSymbol(), baseExchange, trade.getFrom().getExchange());
+        List<Transaction> transferOptions1 = transferStrategy.transferCoinAlternatives(trade.getFrom().getLeftSymbol(), baseExchange, trade.getFrom().getExchange());
         Transaction exchangeTransaction1 = exchangeCoins(baseExchange, baseCoin, trade.getFrom().getLeftSymbol());
         for (Transaction transferOption : transferOptions1) {
             convertAndSendChains.add(new TransactionChain(exchangeTransaction1, transferOption));
@@ -119,7 +112,7 @@ public class TransactionRouterImpl implements TransactionRouter {
 
         //send and convert
         List<TransactionChain> sendAndConvertChains = new ArrayList<>();
-        List<Transaction> transferOptions2 = transferTransactionStrategy.transferCoinAlternatives(baseCoin, baseExchange, trade.getFrom().getExchange());
+        List<Transaction> transferOptions2 = transferStrategy.transferCoinAlternatives(baseCoin, baseExchange, trade.getFrom().getExchange());
         for (Transaction transferOption : transferOptions2) {
             Transaction exchangeTransaction2 = exchangeCoins(transferOption.getResultExchange(), transferOption.getResultCoin(), trade.getFrom().getLeftSymbol());
             sendAndConvertChains.add(new TransactionChain(transferOption, exchangeTransaction2));
@@ -133,7 +126,7 @@ public class TransactionRouterImpl implements TransactionRouter {
     }
 
 
-    private List<TransactionChain> tradeAsSubChainOptions(final Trade trade, final String baseCoin, final TransferTransactionStrategy transferStrategy) {
+    private List<TransactionChain> tradeAsSubChainOptions(final Trade trade, final String baseCoin, final TransferStrategy transferStrategy) {
         List<TransactionChain> chains = new ArrayList<>();
 
         boolean isSameExchangeTrade = trade.getFrom().getExchange() == trade.getTo().getExchange();
