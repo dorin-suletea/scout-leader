@@ -5,30 +5,44 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class TransactionChain implements Transaction {
+public class TransactionChain{
     private final List<Transaction> transactions;
 
     public TransactionChain() {
         transactions = new ArrayList<>();
     }
 
+    public TransactionChain(final TransactionChain... subChains) {
+        this.transactions = new ArrayList<>();
+        addToChain(subChains);
+    }
+
     public TransactionChain(final List<Transaction> transactions) {
         this.transactions = new ArrayList<>(transactions);
+    }
+
+    public TransactionChain(final Transaction... transactions) {
+        this.transactions = new ArrayList<>(Arrays.asList(transactions));
     }
 
     public void addToChain(final Transaction transactionToAdd) {
         transactions.add(transactionToAdd);
     }
 
+    public void addToChain(final TransactionChain... subChains) {
+        for (int i=0;i<subChains.length;i++){
+            transactions.addAll(subChains[i].transactions);
+        }
+    }
+
     public void addToChain(final List<Transaction> transactionToAdd) {
         transactions.addAll(transactionToAdd);
     }
 
-    public void addToChain(final Transaction ... transactionsToAdd) {
+    public void addToChain(final Transaction... transactionsToAdd) {
         transactions.addAll(Arrays.asList(transactionsToAdd));
     }
 
-    @Override
     public TransactionResult getTransactionOutput(final double baseCurrencyDeposit) {
         double inputForNextTrade = baseCurrencyDeposit;
 
@@ -41,7 +55,6 @@ public class TransactionChain implements Transaction {
         return transactionResult;
     }
 
-    @Override
     public String getSignature() {
         StringBuilder ret = new StringBuilder();
         for (Transaction t : transactions) {

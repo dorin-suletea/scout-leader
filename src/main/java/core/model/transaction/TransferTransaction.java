@@ -30,6 +30,16 @@ public class TransferTransaction implements Transaction {
     }
 
     @Override
+    public String getResultCoin() {
+        return coinSymbol;
+    }
+
+    @Override
+    public Exchange getResultExchange() {
+        return toExchange;
+    }
+
+    @Override
     public String toString() {
         return "Transfer : " + coinSymbol + " " + fromExchange + " -- " + toExchange + " ";
     }

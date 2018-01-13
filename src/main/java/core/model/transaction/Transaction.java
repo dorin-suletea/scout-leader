@@ -1,5 +1,7 @@
 package core.model.transaction;
 
+import core.model.Exchange;
+
 public interface Transaction {
     TransactionResult getTransactionOutput(final double baseCurrencyDeposit);
 
@@ -8,4 +10,8 @@ public interface Transaction {
      * does not account for pair prices
      */
     String getSignature();
+
+    String getResultCoin();
+
+    Exchange getResultExchange();
 }

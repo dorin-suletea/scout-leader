@@ -2,6 +2,7 @@ package core.model.transaction;
 
 import core.Constants;
 import core.StringHelper;
+import core.model.Exchange;
 import core.model.Instrument;
 
 public class ExchangeTransaction implements Transaction {
@@ -22,6 +23,16 @@ public class ExchangeTransaction implements Transaction {
     @Override
     public String getSignature() {
         return this.getClass().getSimpleName() + " : " + instrument.getLeftSymbol() + " --- " + instrument.getRightSymbol() + " " + Constants.TRANSACTION_SIGNATURE_DELIMITER + " ";
+    }
+
+    @Override
+    public String getResultCoin() {
+        return instrument.getRightSymbol();
+    }
+
+    @Override
+    public Exchange getResultExchange() {
+        return instrument.getExchange();
     }
 
     @Override
