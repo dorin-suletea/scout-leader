@@ -41,6 +41,11 @@ public class ExchangeTransaction implements Transaction {
     }
 
     @Override
+    public boolean isValid() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "Exchange : " + instrument.getLeftSymbol() + " --- " + instrument.getRightSymbol() + " " + instrument.getExchange()
                 + " [Price " + StringHelper.formattedDouble(instrument.getPrice()) + "]"

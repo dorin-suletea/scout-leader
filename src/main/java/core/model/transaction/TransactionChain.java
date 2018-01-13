@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class TransactionChain implements Transaction{
+public class TransactionChain implements Transaction {
     public static TransactionChain VOID_CHAIN = new TransactionChain();
 
     private final List<Transaction> transactions;
@@ -34,7 +34,7 @@ public class TransactionChain implements Transaction{
     }
 
     public void addToChain(final TransactionChain... subChains) {
-        for (int i=0;i<subChains.length;i++){
+        for (int i = 0; i < subChains.length; i++) {
             transactions.addAll(subChains[i].transactions);
         }
     }
@@ -45,6 +45,9 @@ public class TransactionChain implements Transaction{
         TransactionResult transactionResult = null;
         for (Transaction transaction : transactions) {
             transactionResult = transaction.getTransactionOutput(inputForNextTrade);
+            if (transactionResult == null) {
+                System.out.print("a");
+            }
             inputForNextTrade = transactionResult.getCoinCount();
         }
 
@@ -61,7 +64,7 @@ public class TransactionChain implements Transaction{
 
     @Override
     public String getResultCoin() {
-        return transactions.get(transactions.size()-1).getResultCoin();
+        return transactions.get(transactions.size() - 1).getResultCoin();
     }
 
     @Override
@@ -71,15 +74,15 @@ public class TransactionChain implements Transaction{
 
     @Override
     public Exchange getResultExchange() {
-        return transactions.get(transactions.size()-1).getResultExchange();
+        return transactions.get(transactions.size() - 1).getResultExchange();
     }
 
-    public List<Transaction> flattren(){
+    public List<Transaction> flatten() {
         final List<Transaction> ret = new ArrayList<>();
-        for (Transaction transaction : transactions){
-            if (transaction instanceof TransactionChain){
-                ret.addAll(((TransactionChain)transaction).flattren());
-            }else{
+        for (Transaction transaction : transactions) {
+            if (transaction instanceof TransactionChain) {
+                ret.addAll(((TransactionChain) transaction).flatten());
+            } else {
                 ret.add(transaction);
             }
         }
@@ -103,19 +106,21 @@ public class TransactionChain implements Transaction{
     @Override
     public String toString() {
         StringBuilder ret = new StringBuilder();
-        for (Transaction chainTransactions : this.transactions){
+        for (Transaction chainTransactions : this.transactions) {
             ret.append(chainTransactions.toString());
         }
         return ret.toString();
     }
 
-    public boolean isValidChain() {
-        if (transactions.isEmpty()){
+    public boolean isValid() {
+        if (transactions.isEmpty()) {
             return false;
         }
-
         for (Transaction transaction : transactions) {
             if (transaction == null) {
+                return false;
+            }
+            if (!transaction.isValid()) {
                 return false;
             }
         }

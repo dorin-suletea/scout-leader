@@ -7,5 +7,4 @@ public interface CoinBlacklist {
     void blackListCoins(final Exchange exchange, final String coin);
     boolean isCoinBlackListed(final Exchange exchange, final String coin);
     boolean isCoinBlackListed(final Exchange exchange, final ApiInstrument instrument);
-
 }

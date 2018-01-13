@@ -148,7 +148,7 @@ public class TransactionRouterImpl implements TransactionRouter {
         } else {
             List<TransactionChain> possibleTransferTransactions = transferStrategy.transferCoinAlternatives(legOneOfTrade.getResultCoin(), trade.getFrom().getExchange(), trade.getTo().getExchange());
             for (TransactionChain transferOption : possibleTransferTransactions) {
-                if (transferOption.isValidChain()) {
+                if (transferOption.isValid()) {
                     chains.add(new TransactionChain(Arrays.asList(
                             legOneOfTrade,
                             transferOption,
@@ -166,7 +166,7 @@ public class TransactionRouterImpl implements TransactionRouter {
     private List<TransactionChain> filterOutInvalidChains(List<TransactionChain> unfilteredChains) {
         List<TransactionChain> ret = new ArrayList<>();
         for (TransactionChain c : unfilteredChains) {
-            if (c.isValidChain()) {
+            if (c.isValid()) {
                 ret.add(c);
             }
         }

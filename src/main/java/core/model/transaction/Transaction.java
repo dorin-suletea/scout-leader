@@ -16,4 +16,8 @@ public interface Transaction {
     String getInputCoin();
 
     Exchange getResultExchange();
+
+    boolean isValid();
+
+
 }

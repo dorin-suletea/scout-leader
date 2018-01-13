@@ -21,6 +21,10 @@ public class CoinInfo {
         return withdrawalFee;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
     @Override
     public String toString() {
         return "CoinInfo{" +

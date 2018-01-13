@@ -13,13 +13,13 @@ import java.util.List;
 public class Main {
     public static void main(String args[]) {
 
-        String baseCurrency = "ETH";
-        double deposit = 0.3;
+        String baseCurrency = "USDT";
+        double deposit = 500 ;
 
 
         TransactionRouter transactionRouter = RuntimeModule.getInjectedObject(TransactionRouter.class);
 
-        List<TransactionChainAndChainResult> chains = transactionRouter.getTradeChains(Exchange.BINANCE, baseCurrency, deposit, TransferStrategyType.SIMPLE);
+        List<TransactionChainAndChainResult> chains = transactionRouter.getTradeChains(Exchange.BITTREX, baseCurrency, deposit, TransferStrategyType.SIMPLE);
 
         for (TransactionChainAndChainResult chainAndChainResult : chains){
             System.out.println(chainAndChainResult.toDebugString(deposit));

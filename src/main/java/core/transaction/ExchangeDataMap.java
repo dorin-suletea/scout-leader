@@ -48,7 +48,6 @@ public class ExchangeDataMap {
         if (!coinInfoMap.containsKey(coin)) {
             throw new RuntimeException("Unknown withdrawal fee for " + coin + " Exchange: " + exchange);
         }
-
         return coinInfoMap.get(coin);
     }
 

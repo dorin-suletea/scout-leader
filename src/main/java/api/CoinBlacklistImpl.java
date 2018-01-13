@@ -59,6 +59,7 @@ public class CoinBlacklistImpl implements CoinBlacklist {
         this.blackListCoins(Exchange.BINANCE,"VTC");
         this.blackListCoins(Exchange.BINANCE,"XCP");
         this.blackListCoins(Exchange.BINANCE,"XVC");
+        this.blackListCoins(Exchange.BINANCE,"PIVX");
 
 
         this.blackListCoins(Exchange.BITTREX,"GAS");
@@ -95,5 +96,4 @@ public class CoinBlacklistImpl implements CoinBlacklist {
 
         return isLeftBlacklisted || isRightBlacklisted;
     }
-
 }

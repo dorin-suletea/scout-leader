@@ -2,6 +2,7 @@ package core.transaction.strategy;
 
 import api.CoinBlacklist;
 import core.model.CoinInfo;
+import core.model.Exchange;
 import core.model.transaction.ExchangeTransaction;
 import core.model.transaction.Transaction;
 import core.model.transaction.TransactionChain;
@@ -28,7 +29,7 @@ public class TransferStrategyFactoryImpl implements TransferStrategyFactory {
 
     private TransferStrategy makeSimpleTransferStrategy(final CoinBlacklist coinBlacklist, final ExchangeDataMap exchangeData) {
         return (coin, fromExchange, toExchange) -> {
-            if (coinBlacklist.isCoinBlackListed(fromExchange, coin) || coinBlacklist.isCoinBlackListed(toExchange, coin)) {
+            if (!isCoinTransferable(coin, fromExchange, toExchange, coinBlacklist, exchangeData)) {
                 //coin is blacklisted on one of the exchanges, info incomplete = > invalidate chain
                 return Collections.singletonList(TransactionChain.VOID_CHAIN);
             }
@@ -43,7 +44,7 @@ public class TransferStrategyFactoryImpl implements TransferStrategyFactory {
         return (coin, fromExchange, toExchange) -> {
             List<TransactionChain> ret = new ArrayList<>();
             for (String fastCoin : fastTxCoinProvider.getFastTransactionCoins()) {
-                if (coinBlacklist.isCoinBlackListed(fromExchange, fastCoin) || coinBlacklist.isCoinBlackListed(toExchange, fastCoin)) {
+                if (!isCoinTransferable(coin, fromExchange, toExchange, coinBlacklist, exchangeData)) {
                     continue;
                 }
 
@@ -58,27 +59,29 @@ public class TransferStrategyFactoryImpl implements TransferStrategyFactory {
                 //normal case (baseCoin is not a fastCoin)
                 ExchangeTransaction exchangeIntoFastCoin = TransactionHelper.exchangeCoins(exchangeData, fromExchange, coin, fastCoin);
                 //todo,validate this in a better way
-                if (exchangeIntoFastCoin==null){
+                if (exchangeIntoFastCoin == null) {
                     continue;
                 }
                 TransferTransaction transferTransaction = new TransferTransaction(exchangeIntoFastCoin.getResultCoin(), exchangeData.getCoinInfo(fastCoin, fromExchange).getWithdrawalFee(), fromExchange, toExchange);
                 ExchangeTransaction exchangeFromFastCoin = TransactionHelper.exchangeCoins(exchangeData, fromExchange, transferTransaction.getResultCoin(), coin);
                 //todo,validate this in a better way
-                if (exchangeFromFastCoin==null){
+                if (exchangeFromFastCoin == null) {
                     continue;
                 }
-
-
-
-
-                TransactionChain newChain = new TransactionChain(exchangeIntoFastCoin, transferTransaction,exchangeFromFastCoin);
-                if (newChain.isValidChain()) {
+                TransactionChain newChain = new TransactionChain(exchangeIntoFastCoin, transferTransaction, exchangeFromFastCoin);
+                if (newChain.isValid()) {
                     ret.add(newChain);
                 }
             }
 
             return ret;
         };
+    }
+
+    private boolean isCoinTransferable(final String coin, final Exchange fromExchange, final Exchange toExchange, final CoinBlacklist coinBlacklist, final ExchangeDataMap exchangeDataMap) {
+        boolean coinBlacklisted = coinBlacklist.isCoinBlackListed(fromExchange, coin) || coinBlacklist.isCoinBlackListed(toExchange, coin);
+        boolean coinActive = !coinBlacklisted && exchangeDataMap.getCoinInfo(coin, fromExchange).isActive() && exchangeDataMap.getCoinInfo(coin, toExchange).isActive();
+        return coinActive;
     }
 
     @Override

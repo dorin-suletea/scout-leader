@@ -45,6 +45,11 @@ public class TransferTransaction implements Transaction {
     }
 
     @Override
+    public boolean isValid() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "Transfer : " + coinSymbol + " " + fromExchange + " -- " + toExchange + " ";
     }

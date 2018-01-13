@@ -92,7 +92,7 @@ public class TransactionRouterTest {
     public void assertTransactionsLink(List<TransactionChainAndChainResult> chainResults) {
         for (TransactionChainAndChainResult chain : chainResults) {
             String tempInputCoin = inputCoin;
-            for (Transaction transaction : chain.getChain().flattren()) {
+            for (Transaction transaction : chain.getChain().flatten()) {
                 Assert.assertEquals(chain.getChain().toString(), tempInputCoin, transaction.getInputCoin());
                 tempInputCoin = transaction.getResultCoin();
             }
