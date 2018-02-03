@@ -1,6 +1,9 @@
 package core;
 
-import api.*;
+import api.CoinBlacklist;
+import api.CoinBlacklistImpl;
+import api.KeyProvider;
+import api.KeyProviderImpl;
 import api.exchanges.*;
 import api.exchanges.api.*;
 import com.google.inject.AbstractModule;
@@ -19,18 +22,22 @@ public class RuntimeModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        bind(KeyProvider.class).to(KeyProviderImpl.class);
         bind(BittrexApi.class).to(BittrexApiImpl.class);
         bind(BinanceApi.class).to(BinanceApiImpl.class);
         bind(PoloniexApi.class).to(PoloniexApiImpl.class);
-
         bind(BittrexManager.class).to(BittrexManagerImpl.class);
         bind(BinanceManager.class).to(BinanceManagerImpl.class);
         bind(PoloniexManager.class).to(PoloniexManagerImpl.class);
 
-        bind(ExchangeDataMap.class);
-        bind(CoinBlacklist.class).to(CoinBlacklistImpl.class);
+
+
         bind(FastTxCoinProvider.class).to(FastTxCoinProviderImpl.class);
         bind(TransferStrategyFactory.class).to(TransferStrategyFactoryImpl.class);
+
+
+        bind(ExchangeDataMap.class);
+        bind(CoinBlacklist.class).to(CoinBlacklistImpl.class);
         bind(TransactionRouter.class).to(TransactionRouterImpl.class);
     }
 

@@ -52,6 +52,10 @@ public class BinanceApiImpl implements BinanceApi {
         return ret;
     }
 
+
+    //X-MBX-APIKEY
+    //Content-Type application/x-www-form-urlencoded
+
     public Map<String, Double> withdrawFeeMap() {
         return new HashMap<String, Double>() {{
             put("BNB", 1d);
