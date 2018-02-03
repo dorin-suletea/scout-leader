@@ -1,8 +1,9 @@
 package api.exchanges;
 
 import api.ApiDataObjectHelper;
+import api.TimeProvider;
 import api.exchanges.api.BinanceApi;
-import api.ApiInstrumentInfo;
+import api.model.ApiInstrumentInfo;
 import core.model.CoinInfo;
 import core.model.Exchange;
 
@@ -12,8 +13,9 @@ import java.util.Map;
 
 public class BinanceManagerImpl extends ExchangeManagerBase implements BinanceManager {
 
+
     @Inject
-    public BinanceManagerImpl(final BinanceApi binanceApi) {
+    public BinanceManagerImpl(final BinanceApi binanceApi, final TimeProvider timeProvider) {
         super(binanceApi);
     }
 

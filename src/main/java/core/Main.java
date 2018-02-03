@@ -1,7 +1,6 @@
 package core;
 
-import api.KeyProviderImpl;
-import core.model.Exchange;
+import api.exchanges.api.BinanceApi;
 import core.transaction.TransactionRouter;
 
 /**
@@ -15,15 +14,16 @@ public class Main {
 
 
         TransactionRouter transactionRouter = RuntimeModule.getInjectedObject(TransactionRouter.class);
+        RuntimeModule.getInjectedObject(BinanceApi.class).getAssets();
 
-        //List<TransactionChainAndChainResult> chains = transactionRouter.getTradeChains(Exchange.BITTREX, baseCurrency, deposit, Config.TRANSFER_STRATEGY_STRATEGY);
+//        List<TransactionChainAndChainResult> chains = transactionRouter.getTradeChains(Exchange.BITTREX, baseCurrency, deposit, Config.TRANSFER_STRATEGY_STRATEGY);
 
         //for (TransactionChainAndChainResult chainAndChainResult : chains){
         //    System.out.println(chainAndChainResult.toDebugString(deposit));
         //}
 
-        System.out.print(
-        RuntimeModule.getInjectedObject(KeyProviderImpl.class).getApiKey(Exchange.BINANCE));
+//        System.out.print(
+//        RuntimeModule.getInjectedObject(KeyProviderImpl.class).getApiKey(Exchange.BINANCE));
 
     }
 }

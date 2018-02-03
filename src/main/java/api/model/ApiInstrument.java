@@ -1,4 +1,4 @@
-package api;
+package api.model;
 
 public class ApiInstrument {
     private final String leftSymbol;

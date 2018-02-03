@@ -1,5 +1,7 @@
 package api;
 
+import api.model.ApiInstrument;
+import api.model.ApiInstrumentInfo;
 import core.model.CoinInfo;
 import core.model.Exchange;
 import core.model.Instrument;

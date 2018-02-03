@@ -1,7 +1,7 @@
 package api.exchanges.api;
 
-import api.ApiInstrument;
-import api.ApiInstrumentInfo;
+import api.model.ApiInstrument;
+import api.model.ApiInstrumentInfo;
 
 import java.util.List;
 

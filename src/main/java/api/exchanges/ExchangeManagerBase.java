@@ -2,7 +2,7 @@ package api.exchanges;
 
 import api.ApiDataObjectHelper;
 import api.exchanges.api.ExchangeApi;
-import api.ApiInstrument;
+import api.model.ApiInstrument;
 import core.MathHelper;
 import core.model.Instrument;
 

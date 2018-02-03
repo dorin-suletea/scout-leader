@@ -1,6 +1,6 @@
 package api;
 
 public interface TimeProvider {
-    void setClock(long tsInMillis);
+    void synchronize(long tsInMillis);
     long getCurrentMillis();
 }

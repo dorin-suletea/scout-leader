@@ -1,11 +1,13 @@
 package api.exchanges.api;
 
-import api.ApiInstrument;
-import api.ApiInstrumentInfo;
+import api.model.ApiAsset;
+import api.model.ApiInstrument;
+import api.model.ApiInstrumentInfo;
 
 import java.util.List;
 
 public interface ExchangeApi {
     List<ApiInstrument> getInstruments();
     List<ApiInstrumentInfo> getInstrumentsInfo();
+    List<ApiAsset> getAssets();
 }

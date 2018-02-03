@@ -1,14 +1,23 @@
 package api;
 
+import java.util.Date;
+
 public class TimeProviderImpl implements TimeProvider {
+    private long localTime;
+    private long timeOffset;
+
+    public TimeProviderImpl() {
+        localTime = new Date().getTime();
+    }
+
 
     @Override
-    public void setClock(final long tsInMillis) {
-
+    public void synchronize(final long tsInMillis) {
+        timeOffset = localTime - tsInMillis;
     }
 
     @Override
     public long getCurrentMillis() {
-        return 0;
+        return localTime + timeOffset;
     }
 }

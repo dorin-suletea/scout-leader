@@ -2,7 +2,7 @@ package api.exchanges;
 
 import api.ApiDataObjectHelper;
 import api.exchanges.api.BittrexApi;
-import api.ApiInstrumentInfo;
+import api.model.ApiInstrumentInfo;
 import core.model.CoinInfo;
 import core.model.Exchange;
 

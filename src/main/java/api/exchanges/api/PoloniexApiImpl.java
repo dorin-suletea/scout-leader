@@ -1,7 +1,8 @@
 package api.exchanges.api;
 
-import api.ApiInstrument;
-import api.ApiInstrumentInfo;
+import api.model.ApiAsset;
+import api.model.ApiInstrument;
+import api.model.ApiInstrumentInfo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -62,5 +63,10 @@ public class PoloniexApiImpl implements PoloniexApi {
             throw new RuntimeException(e);
         }
         return ret;
+    }
+
+    @Override
+    public List<ApiAsset> getAssets() {
+        throw new RuntimeException("Not implemented");
     }
 }

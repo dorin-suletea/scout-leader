@@ -1,17 +1,29 @@
 package api.exchanges.api;
 
-import api.ApiInstrument;
-import api.ApiInstrumentInfo;
+import api.KeyProvider;
+import api.TimeProvider;
+import api.model.ApiAsset;
+import api.model.ApiInstrument;
+import api.model.ApiInstrumentInfo;
+import core.model.Exchange;
+import javafx.util.Pair;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.inject.Inject;
+import java.util.*;
 
 public class BinanceApiImpl implements BinanceApi {
+    private final TimeProvider timeProvider;
+    private final KeyProvider keyProvider;
 
+    @Inject
+    public BinanceApiImpl(final TimeProvider timeProvider, final KeyProvider keyProvider) {
+        this.timeProvider = timeProvider;
+        this.keyProvider = keyProvider;
+        this.timeProvider.synchronize(getServerTs());
+    }
 
     @Override
     public List<ApiInstrument> getInstruments() {
@@ -33,8 +45,8 @@ public class BinanceApiImpl implements BinanceApi {
                 ApiInstrument newPair = new ApiInstrument(leftSymbol, rightSymbol, iBuyPriceNoFee, iSellPriceNoFee);
                 ret.add(newPair);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
         }
         return ret;
     }
@@ -52,11 +64,41 @@ public class BinanceApiImpl implements BinanceApi {
         return ret;
     }
 
+    @Override
+    public List<ApiAsset> getAssets() {
+        String query = BinanceApi.ASSETS_URL;
+        final String signature = ApiHelper.encodeHmac(keyProvider.getApiSecret(Exchange.BINANCE), query);
+        query = query + "&signature=" + signature;
 
-    //X-MBX-APIKEY
-    //Content-Type application/x-www-form-urlencoded
 
-    public Map<String, Double> withdrawFeeMap() {
+        String apiResponse = ApiHelper.sendGetWithSSLCert(query, authenticationHeaders());
+        System.out.print(apiResponse);
+        return null;
+    }
+
+
+    private List<Pair<String, String>> authenticationHeaders() {
+        return Arrays.asList(new Pair[]{
+                new Pair("X-MBX-APIKEY", keyProvider.getApiKey(Exchange.BINANCE)),
+                new Pair("Content-Type", "application/x-www-form-urlencoded")
+        });
+    }
+
+//            return "&recvWindow=5000&timestamp=" + timeProvider.getCurrentMillis();
+
+
+    private long getServerTs() {
+        try {
+            final String apiResponse = ApiHelper.sendGetWithSSLCert(BinanceApi.TIME_URL);
+            final JSONObject timeObject = new JSONObject(apiResponse);
+            final long serverTime = timeObject.getLong("serverTime");
+            return serverTime;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Map<String, Double> withdrawFeeMap() {
         return new HashMap<String, Double>() {{
             put("BNB", 1d);
             put("BTC", 0.001);

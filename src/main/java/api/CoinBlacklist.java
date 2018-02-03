@@ -1,5 +1,6 @@
 package api;
 
+import api.model.ApiInstrument;
 import core.model.Exchange;
 
 public interface CoinBlacklist {

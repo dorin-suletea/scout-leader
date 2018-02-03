@@ -1,9 +1,6 @@
 package core;
 
-import api.CoinBlacklist;
-import api.CoinBlacklistImpl;
-import api.KeyProvider;
-import api.KeyProviderImpl;
+import api.*;
 import api.exchanges.*;
 import api.exchanges.api.*;
 import com.google.inject.AbstractModule;
@@ -39,6 +36,7 @@ public class RuntimeModule extends AbstractModule {
         bind(ExchangeDataMap.class);
         bind(CoinBlacklist.class).to(CoinBlacklistImpl.class);
         bind(TransactionRouter.class).to(TransactionRouterImpl.class);
+        bind(TimeProvider.class).to(TimeProviderImpl.class);
     }
 
 }

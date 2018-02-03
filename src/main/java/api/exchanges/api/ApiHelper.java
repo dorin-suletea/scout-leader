@@ -1,17 +1,19 @@
 package api.exchanges.api;
 
 import javafx.util.Pair;
+import org.apache.commons.codec.binary.Hex;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,7 +26,7 @@ public class ApiHelper {
         return sendGet(urlAddress, Collections.EMPTY_LIST);
     }
 
-    public static String sendGetWithSSLCert(final String requestUrl) throws Exception {
+    public static String sendGetWithSSLCert(final String requestUrl) {
         return sendGetWithSSLCert(requestUrl, Collections.EMPTY_LIST);
     }
 
@@ -54,26 +56,42 @@ public class ApiHelper {
     }
 
 
-    public static String sendGetWithSSLCert(final String requestUrl, List<Pair<String, String>> headers) throws Exception {
-        TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
+    public static String sendGetWithSSLCert(final String requestUrl, List<Pair<String, String>> headers) {
+        try {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
 
-                    public void checkClientTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
+                        public void checkClientTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
 
-                    public void checkServerTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
+                        public void checkServerTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
                     }
-                }
-        };
-        SSLContext sc = SSLContext.getInstance("SSL");
-        sc.init(null, trustAllCerts, new java.security.SecureRandom());
-        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        return sendGet(requestUrl, headers);
+            };
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            return sendGet(requestUrl, headers);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String encodeHmac(final String key, final String data) {
+        try {
+            final String encAlgorithm = "HmacSHA256";
+            final Mac sha256 = Mac.getInstance(encAlgorithm);
+            final SecretKeySpec secretKey = new SecretKeySpec(key.getBytes("UTF-8"), encAlgorithm);
+            sha256.init(secretKey);
+            return Hex.encodeHexString(sha256.doFinal(data.getBytes("UTF-8")));
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException | InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static String getStreamContent(final InputStream inputStream) throws IOException {
