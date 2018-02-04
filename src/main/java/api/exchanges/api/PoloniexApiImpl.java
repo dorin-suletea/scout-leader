@@ -6,8 +6,9 @@ import api.model.ApiInstrumentInfo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class PoloniexApiImpl implements PoloniexApi {
 
@@ -31,7 +32,7 @@ public class PoloniexApiImpl implements PoloniexApi {
                 ApiInstrument instrument = new ApiInstrument(leftSymbol, rightSymbol, iBuyPriceNoFee, iSellPriceNoFee);
                 ret.add(instrument);
             }
-        } catch (IOException | JSONException e) {
+        } catch (JSONException e) {
             throw new RuntimeException(e);
         }
         return ret;
@@ -59,7 +60,7 @@ public class PoloniexApiImpl implements PoloniexApi {
                 ret.add(instrumentInfo);
 
             }
-        } catch (IOException | JSONException e) {
+        } catch (JSONException e) {
             throw new RuntimeException(e);
         }
         return ret;

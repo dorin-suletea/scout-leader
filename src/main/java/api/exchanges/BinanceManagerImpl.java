@@ -1,7 +1,6 @@
 package api.exchanges;
 
 import api.ApiDataObjectHelper;
-import api.TimeProvider;
 import api.exchanges.api.BinanceApi;
 import api.model.ApiInstrumentInfo;
 import core.model.CoinInfo;
@@ -15,7 +14,7 @@ public class BinanceManagerImpl extends ExchangeManagerBase implements BinanceMa
 
 
     @Inject
-    public BinanceManagerImpl(final BinanceApi binanceApi, final TimeProvider timeProvider) {
+    public BinanceManagerImpl(final BinanceApi binanceApi) {
         super(binanceApi);
     }
 

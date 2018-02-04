@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +31,7 @@ public class BittrexApiImpl implements BittrexApi {
                 ret.add(newPair);
             }
         } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return ret;
     }
@@ -56,9 +53,7 @@ public class BittrexApiImpl implements BittrexApi {
                 ret.add(info);
             }
         } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return ret;
     }

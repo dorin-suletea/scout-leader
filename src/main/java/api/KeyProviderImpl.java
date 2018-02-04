@@ -2,6 +2,7 @@ package api;
 
 import core.Config;
 import core.model.Exchange;
+import javafx.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class KeyProviderImpl implements KeyProvider {
-    private final Map<Exchange, String> keyMap;
+    private final Map<Exchange, Pair<String, String>> keyMap;
 
     public KeyProviderImpl() {
         this.keyMap = getKeyMap();
@@ -22,11 +23,16 @@ public class KeyProviderImpl implements KeyProvider {
 
     @Override
     public String getApiKey(final Exchange exchange) {
-        return keyMap.get(exchange);
+        return keyMap.get(exchange).getKey();
     }
 
-    private Map<Exchange, String> getKeyMap() {
-        Map<Exchange, String> ret = new HashMap<>();
+    @Override
+    public String getApiSecret(final Exchange exchange) {
+        return keyMap.get(exchange).getValue();
+    }
+
+    private Map<Exchange, Pair<String, String>> getKeyMap() {
+        Map<Exchange, Pair<String, String>> ret = new HashMap<>();
         try (final BufferedReader br = new BufferedReader(new FileReader(Config.KEYSTORE_FILE_PATH))) {
             StringBuilder keystore = new StringBuilder();
             String line;
@@ -38,7 +44,8 @@ public class KeyProviderImpl implements KeyProvider {
                 JSONObject exchangeData = (JSONObject) results.get(i);
                 final String exchangeName = exchangeData.getString("ex");
                 final String key = exchangeData.getString("k");
-                ret.put(Exchange.valueOf(exchangeName), key);
+                final String signature = exchangeData.getString("s");
+                ret.put(Exchange.valueOf(exchangeName), new Pair<>(key, signature));
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

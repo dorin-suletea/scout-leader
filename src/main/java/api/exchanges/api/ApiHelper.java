@@ -14,15 +14,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by next on 12/21/17.
  */
 public class ApiHelper {
 
-    public static String sendGet(final String urlAddress) throws IOException {
+    public static String sendGet(final String urlAddress) {
         return sendGet(urlAddress, Collections.EMPTY_LIST);
     }
 
@@ -31,9 +30,7 @@ public class ApiHelper {
     }
 
 
-    public static String sendGet(final String urlAddress, List<Pair<String, String>> headers) throws IOException {
-        StringBuilder ret = new StringBuilder();
-        BufferedReader rd = null;
+    public static String sendGet(final String urlAddress, List<Pair<String, String>> headers) {
         try {
             URL url = new URL(urlAddress);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -42,19 +39,16 @@ public class ApiHelper {
             for (Pair<String, String> header : headers) {
                 connection.setRequestProperty(header.getKey(), header.getValue());
             }
-            rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String line;
-            while ((line = rd.readLine()) != null) {
-                ret.append(line);
+            connection.connect();
+            if (connection.getResponseCode() == 200) {
+                return ApiHelper.getStreamContent(connection.getInputStream());
+            } else {
+                throw new RuntimeException("Request failed " + connection.getResponseCode() + " " + connection.getResponseMessage() + " " + ApiHelper.getStreamContent(connection.getErrorStream()));
             }
-        } finally {
-            if (rd != null) {
-                rd.close();
-            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return ret.toString();
     }
-
 
     public static String sendGetWithSSLCert(final String requestUrl, List<Pair<String, String>> headers) {
         try {
@@ -84,11 +78,10 @@ public class ApiHelper {
 
     public static String encodeHmac(final String key, final String data) {
         try {
-            final String encAlgorithm = "HmacSHA256";
-            final Mac sha256 = Mac.getInstance(encAlgorithm);
-            final SecretKeySpec secretKey = new SecretKeySpec(key.getBytes("UTF-8"), encAlgorithm);
-            sha256.init(secretKey);
-            return Hex.encodeHexString(sha256.doFinal(data.getBytes("UTF-8")));
+            Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
+            sha256_HMAC.init(secret_key);
+            return Hex.encodeHexString(sha256_HMAC.doFinal(data.getBytes("UTF-8")));
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
