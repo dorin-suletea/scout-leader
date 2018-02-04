@@ -2,6 +2,7 @@ package api.exchanges;
 
 import api.ApiDataObjectHelper;
 import api.exchanges.api.BinanceApi;
+import api.model.ApiAsset;
 import api.model.ApiInstrumentInfo;
 import core.model.CoinInfo;
 import core.model.Exchange;
@@ -27,5 +28,21 @@ public class BinanceManagerImpl extends ExchangeManagerBase implements BinanceMa
     @Override
     public Exchange getExchange() {
         return Exchange.BINANCE;
+    }
+
+    @Override
+    public double getBalanceForCoin(final String coin) {
+        List<ApiAsset> assets = super.exchangeApi.getAssets();
+        for (ApiAsset asset : assets) {
+            if (asset.getCoin().equals(coin)) {
+                return asset.getQuantity();
+            }
+        }
+        throw new RuntimeException("No wallet for coin " + coin + " on exchange " + getExchange());
+    }
+
+    @Override
+    public String getDepositAddress(final String coin) {
+        return super.exchangeApi.getDepositAddress(coin);
     }
 }

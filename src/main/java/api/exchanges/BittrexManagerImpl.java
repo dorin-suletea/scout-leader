@@ -27,4 +27,14 @@ public class BittrexManagerImpl extends ExchangeManagerBase implements BittrexMa
     public Exchange getExchange() {
         return Exchange.BITTREX;
     }
+
+    @Override
+    public double getBalanceForCoin(final String coin) {
+        throw new RuntimeException("not impl");
+    }
+
+    @Override
+    public String getDepositAddress(final String coin) {
+        throw new RuntimeException("not impl");
+    }
 }

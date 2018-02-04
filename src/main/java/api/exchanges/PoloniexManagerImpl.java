@@ -28,4 +28,14 @@ public class PoloniexManagerImpl extends ExchangeManagerBase implements Poloniex
         return Exchange.POLONIEX;
     }
 
+    @Override
+    public double getBalanceForCoin(final String coin) {
+        throw new RuntimeException("not impl");
+    }
+
+    @Override
+    public String getDepositAddress(final String coin) {
+        throw new RuntimeException("not impl");
+    }
+
 }

@@ -1,5 +1,6 @@
 package api.exchanges.api;
 
+import api.JsonParser;
 import api.KeyProvider;
 import api.model.ApiAsset;
 import api.model.ApiInstrument;
@@ -7,42 +8,44 @@ import api.model.ApiInstrumentInfo;
 import core.model.Exchange;
 import javafx.util.Pair;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.inject.Inject;
 import java.util.*;
 
+/**
+ * https://github.com/binance-exchange/binance-official-api-docs/blob/master/wapi-api.md
+ */
 public class BinanceApiImpl implements BinanceApi {
+    private static long RECEIVE_WINDOW = 7000;
+
     private final KeyProvider keyProvider;
+    private final TimeProvider timeProvider;
 
     @Inject
-    public BinanceApiImpl( final KeyProvider keyProvider) {
+    public BinanceApiImpl(final KeyProvider keyProvider, final TimeProvider timeProvider) {
         this.keyProvider = keyProvider;
+        this.timeProvider = timeProvider;
+        this.timeProvider.synchronize(getServerTimestamp());
     }
 
     @Override
     public List<ApiInstrument> getInstruments() {
         final List<ApiInstrument> ret = new ArrayList<>();
-        try {
-            String apiResponse = ApiHelper.sendGetWithSSLCert(BinanceApi.INSTRUMENTS_URL);
+        String apiResponse = ApiHelper.sendGetWithSSLCert(BinanceApi.INSTRUMENTS_URL);
 
-            JSONArray results = new JSONArray(apiResponse);
-            for (int i = 0; i < results.length(); i++) {
-                JSONObject instrumentData = (JSONObject) results.get(i);
+        JSONArray results = JsonParser.getJsonArray(apiResponse);
+        for (int i = 0; i < results.length(); i++) {
+            JSONObject instrumentData = JsonParser.getFromArray(results, i);
+            String symbols = JsonParser.getString(instrumentData, "symbol");
+            //on binance pairs are reversed, and we use the fact that all of the pairs you can buy for have 3 letters (ETH,BTC,BNB,USDT)
+            final String rightSymbol = symbols.substring(0, symbols.length() - 3);
+            final String leftSymbol = symbols.substring(symbols.length() - 3, symbols.length());
+            final double iBuyPriceNoFee = JsonParser.getDouble(instrumentData, "askPrice");
+            final double iSellPriceNoFee = JsonParser.getDouble(instrumentData, "bidPrice");
 
-                String symbols = instrumentData.getString("symbol");
-                //on binance pairs are reversed, and we use the fact that all of the pairs you can buy for have 3 letters (ETH,BTC,BNB,USDT)
-                final String rightSymbol = symbols.substring(0, symbols.length() - 3);
-                final String leftSymbol = symbols.substring(symbols.length() - 3, symbols.length());
-                final double iBuyPriceNoFee = instrumentData.getDouble("askPrice");
-                final double iSellPriceNoFee = instrumentData.getDouble("bidPrice");
-
-                ApiInstrument newPair = new ApiInstrument(leftSymbol, rightSymbol, iBuyPriceNoFee, iSellPriceNoFee);
-                ret.add(newPair);
-            }
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
+            ApiInstrument newPair = new ApiInstrument(leftSymbol, rightSymbol, iBuyPriceNoFee, iSellPriceNoFee);
+            ret.add(newPair);
         }
         return ret;
     }
@@ -62,15 +65,34 @@ public class BinanceApiImpl implements BinanceApi {
 
     @Override
     public List<ApiAsset> getAssets() {
+        List<ApiAsset> ret = new ArrayList<>();
         final String requestUrl = BinanceApi.ASSETS_URL;
-        final String queryString = "recvWindow=7000" + "&timestamp=" + String.valueOf(new Date().getTime());
+        final String queryString = "recvWindow=" + RECEIVE_WINDOW + "&timestamp=" + timeProvider.getCurrentMillis();
         final String signature = "&signature=" + ApiHelper.encodeHmac(keyProvider.getApiSecret(Exchange.BINANCE), queryString);
+        String response = ApiHelper.sendGetWithSSLCert(requestUrl + "?" + queryString + signature, authenticationHeaders());
 
-        ApiHelper.sendGetWithSSLCert(requestUrl + "?" + queryString + signature, authenticationHeaders());
+        JSONObject assetsObject = JsonParser.getJsonObject(response);
+        JSONArray assetsArray = JsonParser.getJsonArray(JsonParser.getString(assetsObject, "balances"));
 
-        return null;
+
+        for (int i = 0; i < assetsArray.length(); i++) {
+            JSONObject assetObject = JsonParser.getFromArray(assetsArray, i);
+            ret.add(new ApiAsset(
+                    JsonParser.getString(assetObject, "asset"),
+                    JsonParser.getDouble(assetObject, "free")
+            ));
+        }
+        return ret;
     }
 
+    @Override
+    public String getDepositAddress(final String coin) {
+        final String requestUrl = BinanceApi.DEPOSIT_API;
+        final String queryString = "asset=" + coin + "&recvWindow=" + RECEIVE_WINDOW + "&timestamp=" + timeProvider.getCurrentMillis();
+        final String signature = "&signature=" + ApiHelper.encodeHmac(keyProvider.getApiSecret(Exchange.BINANCE), queryString);
+        String response = ApiHelper.sendGetWithSSLCert(requestUrl + "?" + queryString + signature, authenticationHeaders());
+        return JsonParser.getString(JsonParser.getJsonObject(response), "address");
+    }
 
     private List<Pair<String, String>> authenticationHeaders() {
         return Arrays.asList(new Pair[]{
@@ -78,6 +100,18 @@ public class BinanceApiImpl implements BinanceApi {
                 new Pair("Content-Type", "application/x-www-form-urlencoded")
         });
     }
+
+    private long getServerTimestamp() {
+        try {
+            final String apiResponse = ApiHelper.sendGetWithSSLCert(BinanceApi.TIME_URL);
+            final JSONObject timeObject = new JSONObject(apiResponse);
+            final long serverTime = timeObject.getLong("serverTime");
+            return serverTime;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private Map<String, Double> withdrawFeeMap() {
         return new HashMap<String, Double>() {{

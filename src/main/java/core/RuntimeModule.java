@@ -34,6 +34,7 @@ public class RuntimeModule extends AbstractModule {
 
 
         bind(ExchangeDataMap.class);
+        bind(TimeProvider.class).to(TimeProviderImpl.class);
         bind(CoinBlacklist.class).to(CoinBlacklistImpl.class);
         bind(TransactionRouter.class).to(TransactionRouterImpl.class);
     }

@@ -10,4 +10,5 @@ public interface ExchangeApi {
     List<ApiInstrument> getInstruments();
     List<ApiInstrumentInfo> getInstrumentsInfo();
     List<ApiAsset> getAssets();
+    String getDepositAddress(final String coin);
 }

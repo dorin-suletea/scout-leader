@@ -1,6 +1,6 @@
 package core;
 
-import api.exchanges.api.BinanceApi;
+import api.exchanges.BinanceManager;
 
 /**
  * Created by next on 12/20/17.
@@ -13,7 +13,7 @@ public class Main {
 
 
 //        TransactionRouter transactionRouter = RuntimeModule.getInjectedObject(TransactionRouter.class);
-        RuntimeModule.getInjectedObject(BinanceApi.class).getAssets();
+        System.out.print(RuntimeModule.getInjectedObject(BinanceManager.class).getBalanceForCoin("ETH"));
 
 //        List<TransactionChainAndChainResult> chains = transactionRouter.getTradeChains(Exchange.BITTREX, baseCurrency, deposit, Config.TRANSFER_STRATEGY_STRATEGY);
 

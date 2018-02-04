@@ -11,4 +11,6 @@ public interface ExchangeManager {
     List<Instrument> getInstruments();
     Map<String, CoinInfo> getCoinInfo();
     Exchange getExchange();
+    double getBalanceForCoin(String coin);
+    String getDepositAddress(String coin);
 }

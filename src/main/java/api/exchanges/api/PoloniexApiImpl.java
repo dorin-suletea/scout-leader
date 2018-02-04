@@ -70,4 +70,9 @@ public class PoloniexApiImpl implements PoloniexApi {
     public List<ApiAsset> getAssets() {
         throw new RuntimeException("Not implemented");
     }
+
+    @Override
+    public String getDepositAddress(final String coin) {
+        throw new RuntimeException("Not implemented");
+    }
 }
